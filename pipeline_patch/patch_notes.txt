@@ -1,0 +1,2 @@
+* hcp_fix needs to be based on HCP Pipeline version (to allow flexible classifier selection), but that is currently incomplete on github, so just fix it here
+* Current diffusion pipeline uses HCP pipeline commit 90b0766636ba83f06c9198206cc7fa90117b0b11 (8/24/2017) to avoid some bugs, so these scripts are modified from that version
