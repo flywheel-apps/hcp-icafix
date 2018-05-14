@@ -232,10 +232,6 @@ if [[ "$fMRIFileCount" == "1" ]]; then
   set +x
   pipeline_status_code=$?
   
-  PostFixName=${fMRINameList}
-  PostFixHP="NO"
-  RSSBC="REVERT"
-  
 else
   echo -e "${CONTAINER} [$(timestamp)] Starting: Multi-Run ICA-FIX Pipeline"
   
@@ -265,10 +261,7 @@ else
       ${ClassifierFile}
   set +x
   pipeline_status_code=$?
-  
-  PostFixName=${ConcatName}
-  PostFixHP="YES"
-  RSSBC="NONE"
+
 fi
 
 # NOTE: Currently these exit codes do NOT reflect success or failure!
@@ -281,82 +274,15 @@ fi
 
 ################################################################################
 # Run PostFix (generate classification scene files)
-echo -e "${CONTAINER} [$(timestamp)] Starting: PostFix Pipeline"
-
-PostFixMatlabMode="0" #Compiled matlab
-DualScene=${HCPPIPEDIR}/PostFix/PostFixScenes/ICA_Classification_DualScreenTemplate.scene
-SingleScene=${HCPPIPEDIR}/PostFix/PostFixScenes/ICA_Classification_SingleScreenTemplate.scene
-
-pipeline_status_code=0
-set -x
-${RUN_POSTFIX} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
-  ${HCPPIPEDIR}/PostFix/PostFix.sh \
-    --study-folder=${StudyFolder} \
-    --subject=${Subject} \
-    --fmri-name=${PostFixName} \
-    --high-pass=${HighPassFilterSeconds} \
-    --template-scene-dual-screen=${DualScene} \
-    --template-scene-single-screen=${SingleScene} \
-    --reuse-high-pass=${PostFixHP} \
-    --matlab-run-mode=${PostFixMatlabMode}
-set +x
-pipeline_status_code=$?
-
-if [[ $pipeline_status_code == 0 ]]; then
-  echo -e "${CONTAINER} [$(timestamp)] PostFix Success!"
-else
-  echo -e "${CONTAINER} [$(timestamp)] PostFix Failure!"
-  exit 1
-fi
+# TODO: optional, but need to fix Matlab MCR version issues to run this
 
 ################################################################################
 # Run RestingStateStats (quality metrics after FIX classification and denoising)
-echo -e "${CONTAINER} [$(timestamp)] Starting: RestingStateStats Pipeline"
-
-OutputProcSTRING="_hp${HighPassFilterSeconds}_clean"
-OutSTRING="stats"
-
-dlabelFile="NONE"
-BCMode=$RSSBC #REVERT for single-run, NONE for multi-run (7T used "NONE")
-WM="${HCPPIPEDIR}/global/config/FreeSurferWMRegLut.txt"
-CSF="${HCPPIPEDIR}/global/config/FreeSurferCSFRegLut.txt"
-
-RSSMatlabMode="0" #Compiled matlab
-
-pipeline_status_code=0
-set -x
-${RUN_RSS} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
-  ${HCPPIPEDIR}/RestingStateStats/RestingStateStats.sh \
-    --path=${StudyFolder} \
-    --subject=${Subject} \
-    --fmri-name=${PostFixName} \
-    --high-pass=${HighPassFilterSeconds} \
-    --reg-name=${RegName} \
-    --low-res-mesh=${LowResMesh} \
-    --final-fmri-res=${FinalfMRIResolution} \
-    --brain-ordinates-res=${BrainOrdinatesResolution} \
-    --smoothing-fwhm=${SmoothingFWHM} \
-    --output-proc-string=${OutputProcSTRING} \
-    --dlabel-file=${dlabelFile} \
-    --matlab-run-mode=${RSSMatlabMode} \
-    --bc-mode=${BCMode} \
-    --out-string=${OutSTRING} \
-    --wm=${WM} \
-    --csf=${CSF}
-set +x
-pipeline_status_code=$?
-
-if [[ $pipeline_status_code == 0 ]]; then
-  echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Success!"
-else
-  echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Failure!"
-  exit 1
-fi
+# TODO: optional, but need to fix Matlab MCR version issues to run this
 
 ################################################################################
 # Generate ICAFIX QC Images
-#TODO: maybe some volume mosaics with mean and stdev like at the end of hcp-func?
-
+# TODO: maybe some volume mosaics with mean and stdev like at the end of hcp-func?
 
 ################################################################################
 # Clean-up and prepare outputs
