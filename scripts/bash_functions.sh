@@ -4,3 +4,4 @@ print_decimal_number () { dec=$(echo $2 15 | awk '{print $1}'); echo $1 | awk '{
 timestamp () { date +"%Y-%m-%d %H:%M:%S %Z"; }
 toupper() { echo "$@" | tr '[:lower:]' '[:upper:]'; };
 tolower() { echo "$@" | tr '[:upper:]' '[:lower:]'; };
+countunique () { echo "$@" | tr " " "\n" | sort -u | wc -w; }

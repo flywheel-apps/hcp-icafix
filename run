@@ -156,39 +156,48 @@ fi
 ################################################################################
 # Unzip HCP-Structural and HCP-Functional outputs
 
-echo -e "${CONTAINER} [$(timestamp)] Unzipping HCP-Structural zip"
+echo -e "${CONTAINER} [$(timestamp)] Unzipping HCP-Structural zip: " $(basename ${StructZipFile})
 unzip -o -q ${StructZipFile} -d ${StudyFolder}
 
 # Identify available HCP-Functional inputs
-FuncZipList="$FuncZipFile"
-for i in 2 3 4 5 6 7 8 9 10; do
-  tmpv="FW_INPUT_FuncZip$i"; tmpv=${!tmpv}
-  if [[ -e "${tmpv}" ]]; then
-    FuncZipList+=" $tmpv"
+# 1. extract fMRIName from hcpfunc_config.json
+# 2. make sure it doesn't conflict with other inputs
+# 3. unzip contents
+FuncZipList=""
+fMRINameList=""
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  if [[ $i == 1 ]]; then
+    FuncZip="$FuncZipFile"
+  else
+    tmpv="FW_INPUT_FuncZip$i"; tmpv=${!tmpv}
+    if [[ ! -e "${tmpv}" ]]; then
+      continue
+    fi
+    FuncZip="${tmpv}"
   fi
-done
-
-# For each FuncZip:
-# 1. unzip contents
-# 2. extract fMRIName from hcpfunc_config.json
-fMRINameList=
-for FuncZip in ${FuncZipList}; do 
+  
+  FuncZipList+=" ${FuncZip}"
+  
+  echo -e "${CONTAINER} [$(timestamp)] Unzipping HCP-Functional input #${i}:" $(basename ${FuncZip})
+    
   tmp_FuncConfigFile=`mktemp -d`"/hcpfunc_config.json"
   unzip -p ${FuncZip} '*hcpfunc_config.json' > ${tmp_FuncConfigFile}
   tmp_fMRIName=$(jq -r '.config.fMRIName // empty' ${tmp_FuncConfigFile})
   rm -f ${tmp_FuncConfigFile}
+  
+  #check for fMRIName conflicts (eg: entered the same FuncZip twice)
+  if [ -z "${tmp_fMRIName}" ]; then
+    echo -e "${CONTAINER} [$(timestamp)] $(basename ${FuncZip}) did not contain config.json!"
+    exit 1
+  elif [[ $(countunique ${fMRINameList} ${tmp_fMRIName}) == $(countunique ${fMRINameList}) ]]; then
+    echo -e "${CONTAINER} [$(timestamp)] $(basename ${FuncZip}) fMRIName conflicts with another FuncZip entry!"
+    exit 1
+  fi
   fMRINameList+=" ${tmp_fMRIName}"
-  echo -e "${CONTAINER} [$(timestamp)] Unzipping HCP-Functional zip: " $(basename $FuncZip)
+  
   #only need to unzip MNINonLinear/Results for ICAFIX
   unzip -o -q ${FuncZip} "${Subject}/MNINonLinear/Results/*" -d ${StudyFolder}
 done
-
-echo "Orig fMRIName list: $fMRINameList"
-
-#if fMRINames aren't unique, might cause problems later. for now just prune and remove any duplicate names
-# how else could we handle this?
-fMRINameList=$(echo "$fMRINameList" | tr " " "\n" | sort -u | tr "\n" " ")
-echo "Unique fMRIName list: $fMRINameList"
 
 #Create @-separated list of preprocessed nifti for each input
 fMRINameList_new=
@@ -217,7 +226,7 @@ fi
 # save list of files extracted from hcpstruct zip so we can remove them from output
 # (specifically, list of ALL files that exist in OUTPUT_DIR at this point)
 FilesToRemove=${OUTPUT_DIR}/to_delete.txt
-( cd ${StudyFolder}; find ${Subject}/ -type f ) > ${FilesToRemove}
+${SCRIPT_DIR}/file_cache.sh -list ${StudyFolder}/${Subject} > ${FilesToRemove}
 
 ################################################################################
 # Run ICAFIX
@@ -246,15 +255,7 @@ else
   echo -e "${CONTAINER} [$(timestamp)] Starting: Multi-Run ICA-FIX Pipeline"
   
   FixScript=${HCPPIPEDIR}/ICAFIX/hcp_fix_multi_run
-  
-  #TODO: if we only put the LD_LIBRARY_PATH thing in hcp_fix, it won't get called for hcp_fix_multi_run
-  # so we either need to put it in settings.sh (where it might cause melodic to crash)
-  # or modify hcp_fix_multi_run?
-  # or we could add it to call_matlab.sh and add that to the patch
-  
-  #TODO: add CONCATNAME folder to to_delete.txt (or just delete it right after this call
 
-  #ConcatName="HCPFIX_CONCATENATED_RUNS"
   ConcatName="ICAFIX_multi"
   for f in ${fMRINameList}; do
     ConcatName+="_${f}"
@@ -362,9 +363,6 @@ if [ -e ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ]; then
   ${RUN_RSS} mv ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ${LogFileDirFull}/RestingStateStats.matlab.log
 fi
 
-#Copy RestingStateStats output PNG to output root dir
-${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*.png ${StudyFolder}/
-
 # NOTE: Currently these exit codes do NOT reflect success or failure!
 if [[ $pipeline_status_code == 0 ]]; then
   echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Success!"
@@ -382,11 +380,15 @@ fi
 # Clean-up and prepare outputs
 
 # Delete files that came from the HCP-Structural and HCP-Functional zip input
+FinalFiles=${OUTPUT_DIR}/final_files.txt
+${SCRIPT_DIR}/file_cache.sh -list ${StudyFolder}/${Subject} > ${FinalFiles}
+${SCRIPT_DIR}/file_cache.sh -diff ${FilesToRemove} ${FinalFiles} > ${FilesToRemove}
+
 cd ${StudyFolder}
 for f in $(cat ${FilesToRemove}); do
   rm -f $f
 done
-rm -f ${FilesToRemove}
+rm -f ${FilesToRemove} ${FinalFiles}
 
 # Add current gear config.json to output for reference in subsequent gears
 # - For now, don't copy full input json since it might contain identifiers from DICOM etc
@@ -398,7 +400,7 @@ rm -f ${FilesToRemove}
 #    new element called ".config" so the new file can be read as though it was flywheel config.json
 OUTPUT_CONFIG_FILE=${StudyFolder}/${Subject}/${Subject}_${fMRIName}_hcpicafix_config.json 
 jq -r '.config.RegName = "'$RegName'" | .config.Subject = "'$Subject'" | .config | {config: .}' $CONFIG_FILE \
-  | jq -r '.config.fMRINameList = "'${fMRINameList/ /@}'"' > ${OUTPUT_CONFIG_FILE}
+  | jq -r '.config.fMRINameList = "'"${fMRINameList}"'"' > ${OUTPUT_CONFIG_FILE}
 
 # If pipeline successful, zip outputs and clean up
 outputzipname=${Subject}_${PostFixName}_hcpicafix.zip 
@@ -421,5 +423,9 @@ zip -r ${OUTPUT_DIR}/${logzipname} ${LogFileDir}/ > ${OUTPUT_DIR}/${logzipname}.
 echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory"
 rm -rf ${StudyFolder}/${Subject}/
 rm -rf ${LogFileDirFull}/
+
+echo -e "${CONTAINER} [$(timestamp)] Final output directory listing:"
+cd ${OUTPUT_DIR}
+du -hs *
 
 exit $pipeline_status_code
