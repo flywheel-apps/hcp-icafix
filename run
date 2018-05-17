@@ -279,17 +279,35 @@ else
 
 fi
 
+FIXnoisefile=$( ls ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/${PostFixName}*.ica/.fix 2>/dev/null )
+FIXmixfile=$( ls ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/${PostFixName}*.ica/filtered_func_data.ica/melodic_mix 2>/dev/null )
+
+if [ -e "${FIXnoisefile}" ]; then
+  #Print summary of classification results
+  numICA=$(cat $FIXmixfile | head -n1 | wc -w)
+  numNoise=$(cat $FIXnoisefile | wc -w)
+  numSignal=$((numICA - numNoise))
+
+  echo -e "${CONTAINER} [$(timestamp)] ICA-FIX classified ${numNoise}/${numICA} ICA components as noise"
+else
+  #FIX results were not created!
+  pipeline_status_code=1
+fi
+
 # NOTE: Currently these exit codes do NOT reflect success or failure!
 if [[ $pipeline_status_code == 0 ]]; then
   echo -e "${CONTAINER} [$(timestamp)] ICA-FIX Success!"
 else
   echo -e "${CONTAINER} [$(timestamp)] ICA-FIX Failure!"
-  exit 1
+  ${RUN_FIX} exit 1
 fi
 
 ################################################################################
 # Run PostFix (generate classification scene files)
 echo -e "${CONTAINER} [$(timestamp)] Starting: PostFix Pipeline"
+
+#PostFix creates scene files, ReclassifyAsNoise.txt, ReclassifyAsSignal.txt, ${fMRIName}.ica/Noise.txt, ${fMRIName}.ica/Signal.txt
+# and some cifti outputs in ${fMRIName}.ica/filtered_func.ica/
 
 PostFixMatlabMode="0" #Compiled matlab
 DualScene=${HCPPIPEDIR}/PostFix/PostFixScenes/ICA_Classification_DualScreenTemplate.scene
@@ -314,12 +332,29 @@ if [ -e ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ]; then
   ${RUN_POSTFIX} mv ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ${LogFileDirFull}/PostFix.matlab.log
 fi
 
+postfix_scenefile="${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/${Subject}_${PostFixName}_ICA_Classification_singlescreen.scene"
+if [ -e "${postfix_scenefile}" ]; then
+  SceneZipFileName=${Subject}_${PostFixName}_ICA_Classification_Scene
+  echo -e "${CONTAINER} [$(timestamp)] Creating PostFix wb_view scene zip: ${SceneZipFileName}.zip"
+
+  ${RUN_POSTFIX} ${SCRIPT_DIR}/create_postfix_scene_zip.sh \
+    ${OUTPUT_DIR} \
+    ${Subject} \
+    ${PostFixName} \
+    ${SceneZipFileName} > ${LogFileDirFull}/PostFix_scene_zip.log
+
+  ${RUN_POSTFIX} unzip -l ${SceneZipFileName}.zip > ${SceneZipFileName}.zip.log
+else
+  #PostFix output file does not exist!
+  pipeline_status_code=1
+fi
+
 # NOTE: Currently these exit codes do NOT reflect success or failure!
 if [[ $pipeline_status_code == 0 ]]; then
   echo -e "${CONTAINER} [$(timestamp)] PostFix Success!"
 else
   echo -e "${CONTAINER} [$(timestamp)] PostFix Failure!"
-  exit 1
+  ${RUN_POSTFIX} exit 1
 fi
 
 ################################################################################
@@ -363,12 +398,40 @@ if [ -e ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ]; then
   ${RUN_RSS} mv ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ${LogFileDirFull}/RestingStateStats.matlab.log
 fi
 
+rss_statsfile=$( ls ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/${PostFixName}_*_stats.dscalar.nii 2>/dev/null )
+if [ -e "${rss_statsfile}" ]; then
+  #Copy RestingStateStats output PNG to output root dir
+  echo -e "${CONTAINER} [$(timestamp)] Copying RestingStateStats images to output"
+  ${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*_OrigTCS_QC_Summary_Plot.png ${StudyFolder}/
+  ${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*_CleanedTCS_QC_Summary_Plot.png ${StudyFolder}/
+  
+  rss_zipfile=${Subject}_${PostFixName}_RestingStateStats.zip
+  echo -e "${CONTAINER} [$(timestamp)] Zipping RestingStateStats results: ${rss_zipfile}"
+
+  #Current approach: Create separate RSS zip for easier access, which will unzip directly into:
+  # <current directory>/${fMRIName}_Atlas_stats.dscalar.nii
+  # <current directory>/${fMRIName}_Atlas_stats.txt
+  # <current directory>/RestingStateStats/*.png
+  (
+    cd ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}; 
+    ${RUN_RSS} rm -f ${OUTPUT_DIR}/${rss_zipfile}; 
+    ${RUN_RSS} zip -r ${OUTPUT_DIR}/${rss_zipfile} \
+      *_stats.dscalar.nii \
+      *_stats.txt \
+      RestingStateStats/ \
+      > ${LogFileDirFull}/${rss_zipfile}.log
+  )
+else
+  #RSS output file does not exist!
+  pipeline_status_code=1
+fi
+
 # NOTE: Currently these exit codes do NOT reflect success or failure!
 if [[ $pipeline_status_code == 0 ]]; then
   echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Success!"
 else
   echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Failure!"
-  exit 1
+  ${RUN_RSS} exit 1
 fi
 
 ################################################################################
