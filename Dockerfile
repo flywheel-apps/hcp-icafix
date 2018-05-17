@@ -54,7 +54,7 @@ RUN apt-get -y update && \
     wget -nv http://www.fmrib.ox.ac.uk/~steve/ftp/fix1.066.tar.gz -O /fix.tar.gz && \
     mkdir -p /tmp/fix && \
     cd /tmp/fix && \
-    tar zxvf /fix.tar.gz --exclude="compiled/Darwin" && \
+    tar zxvf /fix.tar.gz --exclude="compiled/"  --exclude="MCRInstaller.zip" && \
     mv /tmp/fix/fix* /opt/fix && \
     rm /fix.tar.gz && \
     cd / && \
@@ -62,22 +62,28 @@ RUN apt-get -y update && \
 
 ENV FSL_FIXDIR=/opt/fix
 
-# Install Matlab runtime from .zip included with FIX tar
-RUN apt-get -y update && \
+# Download and install Matlab Compiler Runtime v8.5 (2015a)
+# Install the MCR dependencies and some things we'll need and download the MCR
+# from Mathworks -silently install it
+# See http://www.mathworks.com/products/compiler/mcr/ for more info.
+# Adapted from https://github.com/flywheel-apps/matlab-mcr
+RUN apt-get -qq update && apt-get -qq install -y \
+    unzip \
+    xorg \
+    wget \
+    curl && \
     mkdir /mcr-install && \
     mkdir /opt/mcr && \
     cd /mcr-install && \
-    mv /opt/fix/compiled/Linux/x86_64/MCRInstaller.zip /mcr-install && \
-    unzip -q MCRInstaller.zip && \
+    wget -nv http://www.mathworks.com/supportfiles/downloads/R2015a/deployment_files/R2015a/installers/glnxa64/MCR_R2015a_glnxa64_installer.zip && \
+    cd /mcr-install && \
+    unzip -q MCR_R2015a_glnxa64_installer.zip && \
     ./install -destinationFolder /opt/mcr -agreeToLicense yes -mode silent && \
     cd / && \
-    rm -rf mcr-install && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-        
-# Configure environment variables for MCR
-# (update LD_LIBRARY_PATH in a later script, as it seems to conflict with libraries used by "wget" among other things)
-#ENV LD_LIBRARY_PATH /opt/mcr/v83/runtime/glnxa64:/opt/mcr/v83/bin/glnxa64:/opt/mcr/v83/sys/os/glnxa64:$LD_LIBRARY_PATH
-ENV XAPPLRESDIR /opt/mcr/v83/X11/app-defaults
+    rm -rf mcr-install
+
+#ENV LD_LIBRARY_PATH /opt/mcr/v85/runtime/glnxa64:/opt/mcr/v85/bin/glnxa64:/opt/mcr/v85/sys/os/glnxa64 #skip this
+ENV XAPPLRESDIR /opt/mcr/v85/X11/app-defaults
 
 #############################################
 # Download and install FSL 5.0.9
@@ -135,10 +141,10 @@ RUN apt-get -y update && \
 
 ENV HCPPIPEDIR=/opt/HCP-Pipelines
 
-# Manual patch for hcp_fix
+# Manual patche for hcp_fix, re-compiled PostFix and RSS, etc.
 COPY pipeline_patch/ ${HCPPIPEDIR}/
 
-# Manual patch for settings.sh
+# Manual patch for settings.sh and re-compiled FIX
 COPY fix_patch/ ${FSL_FIXDIR}/
 
 #############################################

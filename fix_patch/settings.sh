@@ -102,7 +102,11 @@ FSL_FIX_MATLAB_MODE=0
 
 # Set this to CIFTI Matlab Reader/Writer for use within HCP pipelines
 #FSL_FIX_CIFTIRW='/vols/Data/HCP/workbench/CIFTIMatlabReaderWriter';
-FSL_FIX_CIFTIRW='/export/matlab/MCR/R2012a/v717/toolbox/local';
+#FSL_FIX_CIFTIRW='/export/matlab/MCR/R2012a/v717/toolbox/local';
+#FSL_FIX_CIFTIRW='/opt/HCP-Pipelines/global/matlab'
+#FSL_FIX_CIFTIRW='/opt/HCP-Pipelines/global/matlab:/opt/HCP-Pipelines/global/matlab/gifti-1.6'
+#when compiling, need to create this directory and move $HCPPIPEDIR/global/matlab/*.m and $HCPPIPEDIR/global/matlab/gifti-1.6/@gifti here:
+FSL_FIX_CIFTIRW=${FSL_FIXDIR}/matlab_include 
 
 # Set this to the location of the HCP Workbench command for your platform
 #FSL_FIX_WBC='/vols/Data/HCP/workbench/bin_linux64/wb_command';

@@ -191,21 +191,27 @@ fMRINameList=$(echo "$fMRINameList" | tr " " "\n" | sort -u | tr "\n" " ")
 echo "Unique fMRIName list: $fMRINameList"
 
 #Create @-separated list of preprocessed nifti for each input
+fMRINameList_new=
 fMRIFileList=
 fMRIFileCount=0
 for f in ${fMRINameList}; do
   fMRIFile=${StudyFolder}/${Subject}/MNINonLinear/Results/${f}/${f}.nii.gz
   if [ -e "$fMRIFile" ]; then
+    fMRINameList_new+="${f} "
     fMRIFileList+="${fMRIFile}@"
     fMRIFileCount=$((fMRIFileCount+1))
   else
     echo -e "${CONTAINER} [$(timestamp)] Preprocessed fMRI time-series not found: $f"
   fi
 done
+fMRINameList="${fMRINameList_new}"
 
 if [[ "$fMRIFileCount" == "0" ]]; then
   echo -e "${CONTAINER} [$(timestamp)] No valid HCP-Functional zips!"
   exit 1
+elif [[ "$fMRIFileCount" == "1" ]]; then
+  fMRINameList=$(echo $fMRINameList) #trim whitespace
+  fMRIFileList=${fMRIFileList/@/""} #trim "@"
 fi
 
 # save list of files extracted from hcpstruct zip so we can remove them from output
@@ -226,11 +232,15 @@ if [[ "$fMRIFileCount" == "1" ]]; then
   set -x
   ${RUN_FIX} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
     ${FixScript} \
-      ${fMRIFileList/@/""} \
+      ${fMRIFileList} \
       ${HighPassFilterSeconds} \
       ${ClassifierFile}
   set +x
   pipeline_status_code=$?
+  
+  PostFixName=${fMRINameList}
+  PostFixHP="NO"
+  RSSBC="REVERT"
   
 else
   echo -e "${CONTAINER} [$(timestamp)] Starting: Multi-Run ICA-FIX Pipeline"
@@ -262,6 +272,10 @@ else
   set +x
   pipeline_status_code=$?
 
+  PostFixName=${ConcatName}
+  PostFixHP="YES"
+  RSSBC="NONE"
+
 fi
 
 # NOTE: Currently these exit codes do NOT reflect success or failure!
@@ -274,15 +288,95 @@ fi
 
 ################################################################################
 # Run PostFix (generate classification scene files)
-# TODO: optional, but need to fix Matlab MCR version issues to run this
+echo -e "${CONTAINER} [$(timestamp)] Starting: PostFix Pipeline"
+
+PostFixMatlabMode="0" #Compiled matlab
+DualScene=${HCPPIPEDIR}/PostFix/PostFixScenes/ICA_Classification_DualScreenTemplate.scene
+SingleScene=${HCPPIPEDIR}/PostFix/PostFixScenes/ICA_Classification_SingleScreenTemplate.scene
+
+pipeline_status_code=0
+set -x
+${RUN_POSTFIX} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
+  ${HCPPIPEDIR}/PostFix/PostFix.sh \
+    --study-folder=${StudyFolder} \
+    --subject=${Subject} \
+    --fmri-name=${PostFixName} \
+    --high-pass=${HighPassFilterSeconds} \
+    --template-scene-dual-screen=${DualScene} \
+    --template-scene-single-screen=${SingleScene} \
+    --reuse-high-pass=${PostFixHP} \
+    --matlab-run-mode=${PostFixMatlabMode}
+set +x
+pipeline_status_code=$?
+
+if [ -e ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ]; then
+  ${RUN_POSTFIX} mv ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ${LogFileDirFull}/PostFix.matlab.log
+fi
+
+# NOTE: Currently these exit codes do NOT reflect success or failure!
+if [[ $pipeline_status_code == 0 ]]; then
+  echo -e "${CONTAINER} [$(timestamp)] PostFix Success!"
+else
+  echo -e "${CONTAINER} [$(timestamp)] PostFix Failure!"
+  exit 1
+fi
 
 ################################################################################
 # Run RestingStateStats (quality metrics after FIX classification and denoising)
-# TODO: optional, but need to fix Matlab MCR version issues to run this
+echo -e "${CONTAINER} [$(timestamp)] Starting: RestingStateStats Pipeline"
+
+OutputProcSTRING="_hp${HighPassFilterSeconds}_clean"
+OutSTRING="stats"
+
+dlabelFile="NONE"
+BCMode=$RSSBC #REVERT for single-run, NONE for multi-run (7T used "NONE")
+WM="${HCPPIPEDIR}/global/config/FreeSurferWMRegLut.txt"
+CSF="${HCPPIPEDIR}/global/config/FreeSurferCSFRegLut.txt"
+
+RSSMatlabMode="0" #Compiled matlab
+
+pipeline_status_code=0
+set -x
+${RUN_RSS} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
+  ${HCPPIPEDIR}/RestingStateStats/RestingStateStats.sh \
+    --path=${StudyFolder} \
+    --subject=${Subject} \
+    --fmri-name=${PostFixName} \
+    --high-pass=${HighPassFilterSeconds} \
+    --reg-name=${RegName} \
+    --low-res-mesh=${LowResMesh} \
+    --final-fmri-res=${FinalfMRIResolution} \
+    --brain-ordinates-res=${BrainOrdinatesResolution} \
+    --smoothing-fwhm=${SmoothingFWHM} \
+    --output-proc-string=${OutputProcSTRING} \
+    --dlabel-file=${dlabelFile} \
+    --matlab-run-mode=${RSSMatlabMode} \
+    --bc-mode=${BCMode} \
+    --out-string=${OutSTRING} \
+    --wm=${WM} \
+    --csf=${CSF}
+set +x
+pipeline_status_code=$?
+
+if [ -e ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ]; then
+  ${RUN_RSS} mv ${StudyFolder}/${Subject}_${PostFixName}.matlab.log ${LogFileDirFull}/RestingStateStats.matlab.log
+fi
+
+#Copy RestingStateStats output PNG to output root dir
+${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*.png ${StudyFolder}/
+
+# NOTE: Currently these exit codes do NOT reflect success or failure!
+if [[ $pipeline_status_code == 0 ]]; then
+  echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Success!"
+else
+  echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Failure!"
+  exit 1
+fi
 
 ################################################################################
 # Generate ICAFIX QC Images
 # TODO: maybe some volume mosaics with mean and stdev like at the end of hcp-func?
+# TODO: maybe some scene renderings from RSS?
 
 ################################################################################
 # Clean-up and prepare outputs
@@ -299,14 +393,15 @@ rm -f ${FilesToRemove}
 # - add/update .config.RegName since it might not have been included in config (pre-MSM availability)
 # - add/update .config.Subject since it might later be pulled from other session metadata
 # - add/update .config.fMRINameList so we have a record of which scans went into this
+# TODO: fMRINameList should be stored somewhere more appropriate!
 # - This jq call does the value replacement, then selects just .config but stores it back into a 
 #    new element called ".config" so the new file can be read as though it was flywheel config.json
 OUTPUT_CONFIG_FILE=${StudyFolder}/${Subject}/${Subject}_${fMRIName}_hcpicafix_config.json 
 jq -r '.config.RegName = "'$RegName'" | .config.Subject = "'$Subject'" | .config | {config: .}' $CONFIG_FILE \
-  | jq -r '.config.fMRINameList = "'${fMRINameList}'"' > ${OUTPUT_CONFIG_FILE}
+  | jq -r '.config.fMRINameList = "'${fMRINameList/ /@}'"' > ${OUTPUT_CONFIG_FILE}
 
 # If pipeline successful, zip outputs and clean up
-outputzipname=${Subject}_${fMRIName}_hcpicafix.zip 
+outputzipname=${Subject}_${PostFixName}_hcpicafix.zip 
 echo -e "${CONTAINER} [$(timestamp)] Zipping output file ${outputzipname}"
 ziplistfile=${OUTPUT_DIR}/${outputzipname}.list.txt
 rm -f ${ziplistfile} 
