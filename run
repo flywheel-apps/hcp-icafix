@@ -225,8 +225,10 @@ fi
 
 # save list of files extracted from hcpstruct zip so we can remove them from output
 # (specifically, list of ALL files that exist in OUTPUT_DIR at this point)
-FilesToRemove=${OUTPUT_DIR}/to_delete.txt
-${SCRIPT_DIR}/file_cache.sh -list ${StudyFolder}/${Subject} > ${FilesToRemove}
+OrigFiles=${OUTPUT_DIR}/filecache_orig.txt
+FinalFiles=${OUTPUT_DIR}/filecache_final.txt
+FilesToRemove=${OUTPUT_DIR}/filecache_delete.txt
+${SCRIPT_DIR}/file_cache.sh -list ${StudyFolder}/${Subject} > ${OrigFiles}
 
 ################################################################################
 # Run ICAFIX
@@ -443,15 +445,14 @@ fi
 # Clean-up and prepare outputs
 
 # Delete files that came from the HCP-Structural and HCP-Functional zip input
-FinalFiles=${OUTPUT_DIR}/final_files.txt
 ${SCRIPT_DIR}/file_cache.sh -list ${StudyFolder}/${Subject} > ${FinalFiles}
-${SCRIPT_DIR}/file_cache.sh -diff ${FilesToRemove} ${FinalFiles} > ${FilesToRemove}
+${SCRIPT_DIR}/file_cache.sh -diff ${OrigFiles} ${FinalFiles} > ${FilesToRemove}
 
 cd ${StudyFolder}
 for f in $(cat ${FilesToRemove}); do
   rm -f $f
 done
-rm -f ${FilesToRemove} ${FinalFiles}
+rm -f ${FilesToRemove} ${OrigFiles} ${FinalFiles}
 
 # Add current gear config.json to output for reference in subsequent gears
 # - For now, don't copy full input json since it might contain identifiers from DICOM etc
