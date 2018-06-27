@@ -1,8 +1,10 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/flywheel/hcp-icafix.svg)](https://hub.docker.com/r/flywheel/hcp-icafix/)
+[![Docker Stars](https://img.shields.io/docker/stars/flywheel/hcp-icafix.svg)](https://hub.docker.com/r/flywheel/hcp-icafix/)
 # flywheel/hcp-icafix
-[Flywheel Gear](https://github.com/flywheel-io/gears/tree/master/spec) that runs [ICA-FIX denoising](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX) on functional data preprocessed according to the [Human Connectome Project](http://www.humanconnectome.org) Minimal Preprocessing Pipeline (MPP).  This is based on scripts from the v4.0-alpha release of the ICAFIX, PostFix, and RestingStateStats pipelines. For more info on the pipelines, see [HCP Pipelines](https://github.com/Washington-University/Pipelines). For more info on FSL FIX, including available classifiers, see [FSL FIX User Guide](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide). 
+[Flywheel Gear](https://github.com/flywheel-io/gears/tree/master/spec) that runs [ICA-FIX denoising](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX) on functional data preprocessed according to the [Human Connectome Project](http://www.humanconnectome.org) Minimal Preprocessing Pipeline (MPP).  This is based on scripts from the v4.0-alpha release of the ICAFIX, PostFix, and RestingStateStats pipelines. For more info on the pipelines, see [HCP Pipelines](https://github.com/Washington-University/Pipelines). For more info on FSL FIX, including available classifiers, see [FSL FIX User Guide](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide).
 
 ## Important notes
-* ICA-FIX works best when applied to time series with many volumes. Original HCP rfMRI scans were 15 minutes TR=720ms each (1200 volumes). If data was collected in shorter scans within the same session, it's recommended to concatenate these before running ICA. For this gear, you can provide multiple FuncZip inputs and the pipeline will handle the concatenation and split the outputs once it completes. 
+* ICA-FIX works best when applied to time series with many volumes. Original HCP rfMRI scans were 15 minutes TR=720ms each (1200 volumes). If data was collected in shorter scans within the same session, it's recommended to concatenate these before running ICA. For this gear, you can provide multiple FuncZip inputs and the pipeline will handle the concatenation and split the outputs once it completes.
 * If providing multiple FuncZip inputs, **make sure each HCP-Func gear was run with a unique fMRIName!** Otherwise, scans will be overwritten!
 
 ## Required inputs
@@ -16,7 +18,7 @@
 
 ## Outputs
 * <code>\<subject\>\_\<fMRIName\>\_hcpicafix.zip</code>: Zipped output directory.
-* <code>\<subject\>\_\<fMRIName\>\_RestingStateStats.zip</code>: Zipped RestingStateStats directory containing 
+* <code>\<subject\>\_\<fMRIName\>\_RestingStateStats.zip</code>: Zipped RestingStateStats directory containing
   * <code>\<fMRIName\>\_Atlas\_stats.dscalar.nii</code>: spatial maps of SNR, CNR, etc...
   * <code>\<fMRIName\>\_Atlas\_stats.txt</code>: whole-brain summary of SNR, CNR, etc...
   * <code>RestingStateStats/*.png</code>: gray-plot images depicting impact of ICAFIX and other denoising strategies on time series and global signal.
