@@ -21,20 +21,27 @@ source ${FLYWHEEL_BASE}/docker-env.sh
 source ${SCRIPT_DIR}/bash_functions.sh # some useful tools
 
 ##############################################################################
-# Parse configuration options
+# Parse configuration
 
-# If config.json exists, then we parse config file and cast vals to ENV Vars
-# (Flywheel gear run). Otherwise we parse manifest.json and cast the values to
-# ENV Vars from manifest (Docker run) Note value.default is used to grab the
-# configured defaults.
+# If the config file does not exist (i.e., local run) then parse the config
+# options and values from the manifest. Those variables can be found in the
+# manifest.json file within the `config` map.
 
-if [[ -f $CONFIG_FILE ]]; then
-  eval $(jq -r '.config | to_entries[] | "FW_CONFIG_\(.key)=\(.value)"' $CONFIG_FILE)
-  eval $(jq -r '.inputs | to_entries[] | "FW_INPUT_\(.key)=\(.value.location.path)"' $CONFIG_FILE)
-else
-  CONFIG_FILE=$FLYWHEEL_BASE/manifest.json
-  eval $(jq -r '.config | to_entries[] | "FW_CONFIG_\(.key)=\(.value.default)"' $CONFIG_FILE)
-fi
+function parse_config {
+  CONFIG_FILE=$FLYWHEEL_BASE/config.json
+  MANIFEST_FILE=$FLYWHEEL_BASE/manifest.json
+
+  if [[ -f $CONFIG_FILE ]]; then
+    echo -e "$(cat $CONFIG_FILE | jq -r '.config.'$1)"
+  else
+    CONFIG_FILE=$MANIFEST_FILE
+    echo -e "$(cat $MANIFEST_FILE | jq -r '.config.'$1'.default')"
+  fi
+}
+
+FW_CONFIG_Subject="$(parse_config 'FIXClassifier')"
+FW_CONFIG_RegName="$(parse_config 'RegName')"
+FW_CONFIG_HighPassFilter="$(parse_config 'HighPassFilter')"
 
 ##############################################################################
 # use "echo" for testing arguments without running scripts
@@ -175,16 +182,16 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
     fi
     FuncZip="${tmpv}"
   fi
-  
+
   FuncZipList+=" ${FuncZip}"
-  
+
   echo -e "${CONTAINER} [$(timestamp)] Unzipping HCP-Functional input #${i}:" $(basename ${FuncZip})
-    
+
   tmp_FuncConfigFile=`mktemp -d`"/hcpfunc_config.json"
   unzip -p ${FuncZip} '*hcpfunc_config.json' > ${tmp_FuncConfigFile}
   tmp_fMRIName=$(jq -r '.config.fMRIName // empty' ${tmp_FuncConfigFile})
   rm -f ${tmp_FuncConfigFile}
-  
+
   #check for fMRIName conflicts (eg: entered the same FuncZip twice)
   if [ -z "${tmp_fMRIName}" ]; then
     echo -e "${CONTAINER} [$(timestamp)] $(basename ${FuncZip}) did not contain config.json!"
@@ -194,7 +201,7 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
     exit 1
   fi
   fMRINameList+=" ${tmp_fMRIName}"
-  
+
   #only need to unzip MNINonLinear/Results for ICAFIX
   unzip -o -q ${FuncZip} "${Subject}/MNINonLinear/Results/*" -d ${StudyFolder}
 done
@@ -238,7 +245,7 @@ if [[ "$fMRIFileCount" == "1" ]]; then
 
   # patched version is copied into here
   FixScript=${HCPPIPEDIR}/ICAFIX/hcp_fix
-  
+
   pipeline_status_code=0
   set -x
   ${RUN_FIX} ${FSLDIR}/bin/fsl_sub ${QUEUE} ${FSLSUBOPTIONS} \
@@ -248,14 +255,14 @@ if [[ "$fMRIFileCount" == "1" ]]; then
       ${ClassifierFile}
   set +x
   pipeline_status_code=$?
-  
+
   PostFixName=${fMRINameList}
   PostFixHP="NO"
   RSSBC="REVERT"
-  
+
 else
   echo -e "${CONTAINER} [$(timestamp)] Starting: Multi-Run ICA-FIX Pipeline"
-  
+
   FixScript=${HCPPIPEDIR}/ICAFIX/hcp_fix_multi_run
 
   ConcatName="ICAFIX_multi"
@@ -406,7 +413,7 @@ if [ -e "${rss_statsfile}" ]; then
   echo -e "${CONTAINER} [$(timestamp)] Copying RestingStateStats images to output"
   ${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*_OrigTCS_QC_Summary_Plot.png ${StudyFolder}/
   ${RUN_RSS} cp -f ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}/RestingStateStats/*_CleanedTCS_QC_Summary_Plot.png ${StudyFolder}/
-  
+
   rss_zipfile=${Subject}_${PostFixName}_RestingStateStats.zip
   echo -e "${CONTAINER} [$(timestamp)] Zipping RestingStateStats results: ${rss_zipfile}"
 
@@ -415,8 +422,8 @@ if [ -e "${rss_statsfile}" ]; then
   # <current directory>/${fMRIName}_Atlas_stats.txt
   # <current directory>/RestingStateStats/*.png
   (
-    cd ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName}; 
-    ${RUN_RSS} rm -f ${OUTPUT_DIR}/${rss_zipfile}; 
+    cd ${StudyFolder}/${Subject}/MNINonLinear/Results/${PostFixName};
+    ${RUN_RSS} rm -f ${OUTPUT_DIR}/${rss_zipfile};
     ${RUN_RSS} zip -r ${OUTPUT_DIR}/${rss_zipfile} \
       *_stats.dscalar.nii \
       *_stats.txt \
@@ -460,17 +467,17 @@ rm -f ${FilesToRemove} ${OrigFiles} ${FinalFiles}
 # - add/update .config.Subject since it might later be pulled from other session metadata
 # - add/update .config.fMRINameList so we have a record of which scans went into this
 # TODO: fMRINameList should be stored somewhere more appropriate!
-# - This jq call does the value replacement, then selects just .config but stores it back into a 
+# - This jq call does the value replacement, then selects just .config but stores it back into a
 #    new element called ".config" so the new file can be read as though it was flywheel config.json
-OUTPUT_CONFIG_FILE=${StudyFolder}/${Subject}/${Subject}_${fMRIName}_hcpicafix_config.json 
+OUTPUT_CONFIG_FILE=${StudyFolder}/${Subject}/${Subject}_${fMRIName}_hcpicafix_config.json
 jq -r '.config.RegName = "'$RegName'" | .config.Subject = "'$Subject'" | .config | {config: .}' $CONFIG_FILE \
   | jq -r '.config.fMRINameList = "'"${fMRINameList}"'"' > ${OUTPUT_CONFIG_FILE}
 
 # If pipeline successful, zip outputs and clean up
-outputzipname=${Subject}_${PostFixName}_hcpicafix.zip 
+outputzipname=${Subject}_${PostFixName}_hcpicafix.zip
 echo -e "${CONTAINER} [$(timestamp)] Zipping output file ${outputzipname}"
 ziplistfile=${OUTPUT_DIR}/${outputzipname}.list.txt
-rm -f ${ziplistfile} 
+rm -f ${ziplistfile}
 rm -f ${OUTPUT_DIR}/${outputzipname}
 cd ${StudyFolder}
 # include all remaining files in functional output zip
