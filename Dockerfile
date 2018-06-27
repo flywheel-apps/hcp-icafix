@@ -29,7 +29,7 @@ RUN apt-get update \
 #'class' version 7.3.14
 #'party' version 1.0.25
 #'e1071' version 1.6.7
-#'randomForest' version 4.6.12 
+#'randomForest' version 4.6.12
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
     echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list.d/cran-rstudio.list && \
@@ -88,7 +88,7 @@ ENV XAPPLRESDIR /opt/mcr/v85/X11/app-defaults
 #############################################
 # Download and install FSL 5.0.9
 
-#Build-time key retrieval is sometimes unable to connect to keyserver.  Instead, download the public key manually and store it in plaintext 
+#Build-time key retrieval is sometimes unable to connect to keyserver.  Instead, download the public key manually and store it in plaintext
 #within repo.  You should run these commands occassionally to make sure the saved public key is up to date:
 #gpg --keyserver hkp://pgp.mit.edu:80  --recv 0xA5D32F012649A5A9 && \
 #gpg --export --armor 0xA5D32F012649A5A9 > neurodebian_pgpkey.txt && \
@@ -134,7 +134,7 @@ RUN apt-get -y update && \
     wget -nv https://github.com/Washington-University/Pipelines/archive/90b0766636ba83f06c9198206cc7fa90117b0b11.tar.gz -O pipelines.tar.gz && \
     cd /opt/ && \
     tar zxvf /pipelines.tar.gz && \
-    mv /opt/Pipelines-* /opt/HCP-Pipelines && \
+    mv /opt/*ipelines* /opt/HCP-Pipelines && \
     rm /pipelines.tar.gz && \
     cd / && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
