@@ -33,6 +33,7 @@ function parse_config {
 
   if [[ -f $CONFIG_FILE ]]; then
     echo -e "$(cat $CONFIG_FILE | jq -r '.config.'$1)"
+    eval $(jq -r '.inputs | to_entries[] | "FW_INPUT_\(.key)=\(.value.location.path)"' $CONFIG_FILE)
   else
     CONFIG_FILE=$MANIFEST_FILE
     echo -e "$(cat $MANIFEST_FILE | jq -r '.config.'$1'.default')"
