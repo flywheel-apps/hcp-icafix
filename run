@@ -27,13 +27,17 @@ source ${SCRIPT_DIR}/bash_functions.sh # some useful tools
 # options and values from the manifest. Those variables can be found in the
 # manifest.json file within the `config` map.
 
+if [[ -f $CONFIG_FILE ]]; then
+  eval $(jq -r '.inputs | to_entries[] | "FW_INPUT_\(.key)=\(.value.location.path)"' $CONFIG_FILE)
+  echo "$(set | grep FW_INPUT)"
+fi
+
 function parse_config {
   CONFIG_FILE=$FLYWHEEL_BASE/config.json
   MANIFEST_FILE=$FLYWHEEL_BASE/manifest.json
 
   if [[ -f $CONFIG_FILE ]]; then
     echo -e "$(cat $CONFIG_FILE | jq -r '.config.'$1)"
-    eval $(jq -r '.inputs | to_entries[] | "FW_INPUT_\(.key)=\(.value.location.path)"' $CONFIG_FILE)
   else
     CONFIG_FILE=$MANIFEST_FILE
     echo -e "$(cat $MANIFEST_FILE | jq -r '.config.'$1'.default')"
