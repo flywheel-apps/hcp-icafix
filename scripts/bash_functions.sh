@@ -14,7 +14,7 @@ cleanup () {
     zip -r /tmp/logs.zip ${logdir}
   fi
   echo -e "Cleaning up $1"
-  rm -rf "$out_dir/*"
+  rm -rf "$out_dir"/*
   if [[ -e /tmp/logs.zip ]]; then
     mv /tmp/logs.zip ${out_dir}
   fi
