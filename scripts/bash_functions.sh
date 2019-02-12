@@ -13,8 +13,16 @@ cleanup () {
     cd /flywheel/v0/output
     zip -r /tmp/logs.zip ${logdir}
   fi
-  echo -e "Cleaning up $1"
-  rm -rf "$out_dir"/*
+  if [[ -z $1 ]]; then
+    echo -e "Cleaning up output directory"
+    rm -rf /flywheel/v0/output/*
+  else
+    echo -e "Preserving output directory contents"
+    cd /flywheel/v0/output
+    zip -r /tmp/hcp-icafic_output_error.zip ./*
+    rm -rf /flywheel/v0/output/*
+    mv /tmp/hcp-icafic_output_error.zip .
+  fi
   if [[ -e /tmp/logs.zip ]]; then
     mv /tmp/logs.zip ${out_dir}
   fi

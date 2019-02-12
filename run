@@ -48,6 +48,11 @@ FW_CONFIG_Subject="$(parse_config 'Subject')"
 FW_CONFIG_FIXClassifier="$(parse_config 'FIXClassifier')"
 FW_CONFIG_RegName="$(parse_config 'RegName')"
 FW_CONFIG_HighPassFilter="$(parse_config 'HighPassFilter')"
+FW_CONFIG_PreserveOnError="$(parse_config 'HighPassFilterPreserveOnError')"
+
+if [[ "$FW_CONFIG_PreserveOnError" == 'false' ]]; then
+  FW_CONFIG_PreserveOnError=''
+fi
 
 ##############################################################################
 # use "echo" for testing arguments without running scripts
@@ -102,7 +107,7 @@ hcpfunc_SmoothingFWHM=$(jq -r '.config.SmoothingFWHM // empty' ${FuncConfigFile}
 if [[ -z "${hcpfunc_Subject}" ]]; then
   echo -e "${CONTAINER} [$(timestamp)] ${FuncZipFile} did not contain ${FuncConfigFile}!"
   echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-  cleanup
+  cleanup ${FW_CONFIG_PreserveOnError}
   exit 1
 fi
 
@@ -123,7 +128,7 @@ elif [[ ! -z "${FW_CONFIG_FIXClassifier}" ]]; then
   if [[ ! -e "${ClassifierFile}" ]]; then
     echo -e "${CONTAINER} [$(timestamp)] No RData training file found: ${FW_CONFIG_FIXClassifier}!"
     echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-    cleanup
+    cleanup ${FW_CONFIG_PreserveOnError}
     exit 1
   fi
 fi
@@ -206,12 +211,12 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
   if [ -z "${tmp_fMRIName}" ]; then
     echo -e "${CONTAINER} [$(timestamp)] $(basename ${FuncZip}) did not contain config.json!"
     echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-    cleanup
+    cleanup ${FW_CONFIG_PreserveOnError}
     exit 1
   elif [[ $(countunique ${fMRINameList} ${tmp_fMRIName}) == $(countunique ${fMRINameList}) ]]; then
     echo -e "${CONTAINER} [$(timestamp)] $(basename ${FuncZip}) fMRIName conflicts with another FuncZip entry!"
     echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-    cleanup
+    cleanup ${FW_CONFIG_PreserveOnError}
     exit 1
   fi
   fMRINameList+=" ${tmp_fMRIName}"
@@ -239,7 +244,7 @@ fMRINameList="${fMRINameList_new}"
 if [[ "$fMRIFileCount" == "0" ]]; then
   echo -e "${CONTAINER} [$(timestamp)] No valid HCP-Functional zips!"
   echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-  cleanup
+  cleanup ${FW_CONFIG_PreserveOnError}
   exit 1
 elif [[ "$fMRIFileCount" == "1" ]]; then
   fMRINameList=$(echo $fMRINameList) #trim whitespace
@@ -331,7 +336,7 @@ else
   echo -e "${CONTAINER} [$(timestamp)] ICA-FIX Failure!"
   echo -e "${CONTAINER} [$(timestamp)] Exit code was: $pipeline_status_code"
   echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-  cleanup
+  cleanup ${FW_CONFIG_PreserveOnError}
   ${RUN_FIX} exit 1
 fi
 
@@ -391,7 +396,7 @@ else
   echo -e "${CONTAINER} [$(timestamp)] PostFix Failure!"
   echo -e "${CONTAINER} [$(timestamp)] Exit code was: $pipeline_status_code"
   echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-  cleanup
+  cleanup ${FW_CONFIG_PreserveOnError}
   ${RUN_POSTFIX} exit 1
 fi
 
@@ -473,7 +478,7 @@ else
   echo -e "${CONTAINER} [$(timestamp)] RestingStateStats Failure!"
   echo -e "${CONTAINER} [$(timestamp)] Exit code was: $pipeline_status_code"
   echo -e "${CONTAINER} [$(timestamp)] Cleaning output directory and exiting!"
-  cleanup
+  cleanup ${FW_CONFIG_PreserveOnError}
   ${RUN_RSS} exit 1
 fi
 
