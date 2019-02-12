@@ -48,7 +48,7 @@ FW_CONFIG_Subject="$(parse_config 'Subject')"
 FW_CONFIG_FIXClassifier="$(parse_config 'FIXClassifier')"
 FW_CONFIG_RegName="$(parse_config 'RegName')"
 FW_CONFIG_HighPassFilter="$(parse_config 'HighPassFilter')"
-FW_CONFIG_PreserveOnError="$(parse_config 'HighPassFilterPreserveOnError')"
+FW_CONFIG_PreserveOnError="$(parse_config 'PreserveOnError')"
 
 if [[ "$FW_CONFIG_PreserveOnError" == 'false' ]]; then
   FW_CONFIG_PreserveOnError=''
