@@ -9,9 +9,11 @@ cleanup () {
   out_dir=/flywheel/v0/output/
   logdir=/flywheel/v0/output/logs
   if [[ -d ${logdir} ]]; then
-    echo "zipping logs..."
+    echo "Zipping logs..."
     cd /flywheel/v0/output
-    zip -r /tmp/logs.zip ${logdir}
+    zip -r /tmp/pipelineLogs.zip ${logdir}
+    logs=$(find ./* -name "*log*" -o -name "*Log*" -type f)
+    zip /tmp/allLogs.zip ${logs}
   fi
   if [[ -z $1 ]]; then
     echo -e "Cleaning up output directory"
@@ -19,11 +21,11 @@ cleanup () {
   else
     echo -e "Preserving output directory contents"
     cd /flywheel/v0/output
-    zip -r /tmp/hcp-icafic_output_error.zip ./*
+    zip -r /tmp/hcp-icafix_output_error.zip ./*
     rm -rf /flywheel/v0/output/*
-    mv /tmp/hcp-icafic_output_error.zip .
+    mv /tmp/hcp-icafix_output_error.zip .
   fi
-  if [[ -e /tmp/logs.zip ]]; then
-    mv /tmp/logs.zip ${out_dir}
+  if [[ -e /tmp/pipelineLogs.zip ]]; then
+    mv /tmp/*Logs.zip ${out_dir}
   fi
 }
