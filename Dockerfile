@@ -101,17 +101,23 @@ RUN apt-get update && \
     curl -sSL http://neuro.debian.net/lists/trusty.us-ca.full >> /etc/apt/sources.list.d/neurodebian.sources.list && \
     apt-key add /tmp/neurodebian_pgpkey.txt && \
     apt-get update && \
-    apt-get install -y fsl-core && \
+    apt-get install -y dc && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+## Install FSL 5.0.10
+WORKDIR /opt/
+RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
+        chmod +x fslinstaller.py && \
+        ./fslinstaller.py -q -d /usr/local/fsl -V 5.0.10
+
 # Configure FSL environment
-ENV FSLDIR=/usr/share/fsl/5.0
+ENV FSLDIR=/usr/local/fsl
 ENV FSL_DIR="${FSLDIR}"
 ENV FSLOUTPUTTYPE=NIFTI_GZ
-ENV PATH=/usr/lib/fsl/5.0:$PATH
+ENV PATH=/usr/local/fsl/bin:$PATH
 ENV FSLMULTIFILEQUIT=TRUE
-ENV POSSUMDIR=/usr/share/fsl/5.0
-ENV LD_LIBRARY_PATH=/usr/lib/fsl/5.0:$LD_LIBRARY_PATH
+ENV POSSUMDIR=/usr/local/fsl/
+ENV LD_LIBRARY_PATH=/usr/local/fsl/lib:$LD_LIBRARY_PATH
 ENV FSLTCLSH=/usr/bin/tclsh
 ENV FSLWISH=/usr/bin/wish
 ENV FSLOUTPUTTYPE=NIFTI_GZ
@@ -131,13 +137,13 @@ ENV CARET7DIR=/usr/bin
 RUN apt-get -y update && \
     apt-get install -y wget && \
     apt-get install -y --no-install-recommends python-numpy && \
-    wget -nv https://github.com/Washington-University/Pipelines/archive/90b0766636ba83f06c9198206cc7fa90117b0b11.tar.gz -O pipelines.tar.gz && \
-    cd /opt/ && \
-    tar zxvf /pipelines.tar.gz && \
-    mv /opt/*ipelines* /opt/HCP-Pipelines && \
-    rm /pipelines.tar.gz && \
-    cd / && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /opt/
+RUN wget -nv https://github.com/Washington-University/Pipelines/archive/90b0766636ba83f06c9198206cc7fa90117b0b11.tar.gz -O pipelines.tar.gz && \
+    tar zxvf pipelines.tar.gz && \
+    rm pipelines.tar.gz && \
+    mv /opt/*ipelines* /opt/HCP-Pipelines
 
 ENV HCPPIPEDIR=/opt/HCP-Pipelines
 
