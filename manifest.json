@@ -39,21 +39,98 @@
     }
   },
   "inputs": {
-    "CustomClassifier": {
-      "description": "User-supplied .RData file for FIX component classification. If provide, pipeline overrides FIXClassifier config param",
+    "rfMRI_REST1_RL": {
+      "description": "Select the rfMRI_REST1_RL analysis to be concatenated into the ICA run if desired",
       "base": "file",
       "optional": true
     },
-    "StructZip": {
-      "description": "Zipped output from HCP-Struct pipeline",
+    "rfMRI_REST1_LR": {
+      "description": "Select the rfMRI_REST1_LR analysis to be concatenated into the ICA run if desired",
       "base": "file",
-      "type": {
-        "enum": [
-          "zip"
-        ]
-      },
-      "optional": false
+      "optional": true
     },
+    "rfMRI_REST2_RL": {
+      "description": "Select the rfMRI_REST2_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "rfMRI_REST2_LR": {
+      "description": "Select the rfMRI_REST2_LR analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_WM_RL": {
+      "description": "Select the rfMRI_WM_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_WM_LR": {
+      "description": "Select the rfMRI_WM_LR analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_GAMBLING_RL": {
+      "description": "Select the rfMRI_GAMBLING_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_GAMBLING_LR": {
+      "description": "Select the rfMRI_GAMBLING_LR analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_MOTOR_RL": {
+      "description": "Select the rfMRI_MOTOR_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_MOTOR_LR": {
+      "description": "Select the rfMRI_MOTOR_LR analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_LANGUAGE_RL": {
+      "description": "Select the rfMRI_LANGUAGE_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_LANGUAGE_LR": {
+      "description": "Select the rfMRI_LANGUAGE_LR analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_SOCIAL_RL": {
+      "description": "Select the tfMRI_SOCIAL_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_SOCIAL_LR": {
+      "description": "Select the rfMRI_REST1_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_RELATIONAL_RL": {
+      "description": "Select the tfMRI_RELATIONAL_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_RELATIONAL_LR": {
+      "description": "Select the rfMRI_REST1_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_EMOTION_RL": {
+      "description": "Select the tfMRI_EMOTION_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+    "tfMRI_EMOTION_LR": {
+      "description": "Select the rfMRI_REST1_RL analysis to be concatenated into the ICA run if desired",
+      "base": "file",
+      "optional": true
+    },
+
+   },
     "FuncZip": {
       "description": "Zipped output from HCP-Func pipeline",
       "base": "file",

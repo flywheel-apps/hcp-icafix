@@ -30,6 +30,7 @@ def get_custom_logger(log_name):
                 datefmt='%Y-%m-%d %H:%M:%S')
     handler.setFormatter(formatter)
     logger = logging.getLogger(log_name)
+    logger.propagate = False
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 

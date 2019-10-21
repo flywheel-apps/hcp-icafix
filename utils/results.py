@@ -3,7 +3,7 @@ import json
 import subprocess as sp
 import shutil
 
-def save_config(context):
+def save_hcpstruct_config(context):
     # Add current gear config.json to output for reference in subsequent gears
     # - For now, don't copy full input json since it might contain identifiers from DICOM etc
     # - add/update .config.RegName since it might not have been included in config (pre-MSM availability)
@@ -23,7 +23,7 @@ def save_config(context):
             hcpstruct_config[key]=context.config[key]
 
     with open(op.join(context.work_dir,context.config['Subject'],
-            context.config['Subject']+'_hcpfunc_config.json'),'w') as f:
+            context.config['Subject']+'_hcpstruct_config.json'),'w') as f:
         json.dump(hcpstruct_config,f)
 
 def preserve_whitelist_files(context):
@@ -32,9 +32,9 @@ def preserve_whitelist_files(context):
             context.log.info('Copying file to output: {}'.format(fl))
             shutil.copy(fl,context.output_dir)
             
-def zip_output(context):
+def zip_hcpstruct_output(context):
     environ = context.custom_dict['environ']
-    outputzipname=context.config['Subject']+'_hcpfunc.zip'
+    outputzipname=context.config['Subject']+'_hcpstruct.zip'
     context.log.info('Zipping output file {}'.format(outputzipname))
     os.chdir(context.work_dir)
     try:
@@ -76,6 +76,21 @@ def zip_pipeline_logs(context):
                     universal_newlines=True, env=environ)
         # Wait for Popen call to finish
         p.communicate()
+        
+def export_metadata(context):
+    # Write Metadata to Analysis Object
+    if 'analysis' in context.custom_dict['metadata'].keys():
+        info = context.custom_dict['metadata']['analysis']['info']
+        # if this metadata is not empty
+        if len(info.keys())>0:
+            ## TODO: The below is a work around until we get the .metadata.json 
+            ## file functionality working
+            # Initialize the flywheel client
+            fw = context.client
+            analysis_id = context.destination['id']
+            # Update metadata
+            analysis_object = fw.get(analysis_id)
+            analysis_object.update_info(info)
 
 def cleanup(context):
     # Move all images to output directory
@@ -88,25 +103,16 @@ def cleanup(context):
         p.communicate()
     except:
         context.log.error('There are no images to save.')
-    save_config(context)
-    zip_output(context)
+    save_hcpstruct_config(context)
+    zip_hcpstruct_output(context)
     zip_pipeline_logs(context)
     preserve_whitelist_files(context)
-    # Write Metadata to file
-    if 'analysis' in context.custom_dict['metadata'].keys():
-        info = context.custom_dict['metadata']['analysis']['info']
-        ## TODO: The below is a work around until we get the .metadata.json 
-        ## file functionality working
-        # Initialize the flywheel client
-        fw = context.client
-        analysis_id = context.destination['id']
-        # Update metadata
-        analysis_object = fw.get(analysis_id)
-        analysis_object.update_info(info)
+    export_metadata(context)
+
     # List final directory to log
     context.log.info('Final output directory listing: \n')
     os.chdir(context.output_dir)
     duResults = sp.Popen('du -hs *',shell=True,stdout=sp.PIPE, stderr=sp.PIPE,
                 universal_newlines=True)
     stdout, _ = duResults.communicate()
-    context.log.info('\n' + stdout)           
+    context.log.info('\n' + stdout)
