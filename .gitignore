@@ -1,1 +1,6 @@
 ignore*
+work/
+input/
+ouptut/
+calldocker.sh
+config.json

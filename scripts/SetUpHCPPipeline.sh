@@ -22,7 +22,7 @@ export CARET7DIR=/usr/bin
 export MSMBINDIR=${HCPPIPEDIR}/MSMBinaries
 export MSMCONFIGDIR=${HCPPIPEDIR}/MSMConfig
 #export MATLAB_COMPILER_RUNTIME=/media/myelin/brainmappers/HardDrives/1TB/MATLAB_Runtime/v901
-export MATLAB_COMPILER_RUNTIME=/opt/mcr/v85
+export MATLAB_COMPILER_RUNTIME=/opt/mcr/v93
 export FSL_FIXDIR=/opt/fix
 
 #For HCP Pipeline v3.x

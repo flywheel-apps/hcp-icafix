@@ -76,4 +76,4 @@ def set_environment(environ_json, log):
         os.environ[key] = environ[key]
 
     # Pass back the environ dict in case the run.py program has need of it later on.
-    return environ
+    return os.environ
