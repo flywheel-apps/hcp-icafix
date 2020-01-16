@@ -206,7 +206,9 @@ def support_geardict(context, subid, funcname, output_zip_name, exclude_from_out
 
 def main():
     with flywheel.gear_context.GearContext() as context:
-
+        
+        
+        
         context.gear_dict = {}
 
         # Log the config settings
@@ -235,10 +237,14 @@ def main():
 
         # Check the input files
         try:
-            struct_zip = context.get_input_path('structural_zip')
-            func_zip = context.get_input_path('functional_zip')
-            log.debug('struct Path: {}'.format(struct_zip))
-            log.debug('func Path: {}'.format(func_zip))
+            struct_zip = pathlib.Path(context.get_input_path('structural_zip'))
+            func_zip = pathlib.Path(context.get_input_path('functional_zip'))
+            log.info('struct Path: {}'.format(struct_zip))
+            log.info('func Path: {}'.format(func_zip))
+            
+            struct_base = struct_zip.parent
+            log.info(list(struct_base.glob('*')))
+            
             
             
             
