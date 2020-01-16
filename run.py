@@ -108,7 +108,7 @@ def check_input_files(workdir, zip_files):
     # Look for the fMRI file in the specified location
     example = pathlib.Path(zip_files[0])
     base = example.parts[0]
-
+    log.info('{}'.format(base))
     # Following HCP directory structure, input fMRI should be preprocessed and in the MNINonLinear/Results directory
     rx = '.*MNINonLinear\/Results\/([a-zA-Z0-9_]+)\/.*'
 
@@ -120,7 +120,7 @@ def check_input_files(workdir, zip_files):
     # Now take the directory name just after MNINonLinear/Results.  There should only be one functional scan directory
     locate_match = [pathlib.Path(a).parts[3] for a in sub_files]
     matches = np.unique(locate_match)
-
+    log.info(matches)
     # If there's more than one, how do we know which one to do ICA on?  
     if len(matches) > 1:
         log.error('Multiple functional scans found.  For single run HPC-ICAFIX, only provide one functional run')
@@ -242,11 +242,11 @@ def main():
             log.info('struct Path: {}'.format(struct_zip))
             log.info('func Path: {}'.format(func_zip))
             
-            struct_base = struct_zip.parent
-            log.info(list(struct_base.glob('*')))
-            print(list(struct_base.glob('*')))
-            print('struct Path: {}'.format(struct_zip))
-            print('func Path: {}'.format(func_zip))
+            # struct_base = struct_zip.parent
+            # log.info(list(struct_base.glob('*')))
+            # print(list(struct_base.glob('*')))
+            # print('struct Path: {}'.format(struct_zip))
+            # print('func Path: {}'.format(func_zip))
             
             
             zip_contents = []
@@ -254,7 +254,7 @@ def main():
 
             log.info('Checking structural zip files')
             contents, config = gp.preprocess_hcp_zip(struct_zip.as_posix())
-            print(contents)
+            #print(contents)
             zip_contents.extend(contents)
             config_files.append(config_files)
 
