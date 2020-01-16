@@ -130,8 +130,6 @@ def check_input_files(workdir, zip_files):
     # HCP expects the functional file to have the same name as it's parent directory (MNINonLinear/Results/func_scan/func_scan.nii.gz)
     func_base = matches[0]
     func_file = pathlib.PurePath(base).joinpath('MNINonLinear', 'Results', func_base,'{}.nii.gz'.format(func_base))
-    print('TRYING TO FIUCKING LOG')
-    log.info("TRYING TO FUCKING LOG")
     log.info(zip_files[0])
     # If it's not there, you're not following HCP protocols.  This is an HCP gear, it runs on HCP directories, not your
     # Poorly organized garbage.
@@ -278,9 +276,9 @@ def main():
         # Unzip the files
         try:
             log.info('Unzipping structural files')
-            gp.unzip_hcp(context, struct_zip)
+            gp.unzip_hcp(context, struct_zip.as_posix())
             log.info('Unzipping functional files')
-            gp.unzip_hcp(context, func_zip)
+            gp.unzip_hcp(context, func_zip.as_posix())
         except Exception as e:
             log.exception(e)
             log.fatal('Unzipping HCP scruct and func zips failed')
