@@ -4,7 +4,11 @@ import json
 import pathlib
 import numpy as np
 import flywheel
-
+from utils import gear_preliminaries as gp
+from utils import gear_toolkit_command_line as gtkcl
+from collections import OrderedDict
+from utils import results
+import re
 import logging
 
 # #### Setup logging as per SSE best practices
@@ -20,20 +24,17 @@ import logging
 flywheelv0 = "/flywheel/v0"
 environ_json = '/tmp/gear_environ.json'
 
-#### Setup logging as per SSE best practices
-try:
+log = logging.getLogger(__name__)
 
-    FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
-    logging.basicConfig(format=FORMAT)
-    log = logging.getLogger(__name__)
-except Exception as e:
-    raise Exception("Error Setting up logger") from e
+# #### Setup logging as per SSE best practices
+# try:
+# 
+#     FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
+#     logging.basicConfig(format=FORMAT)
+#     log = logging.getLogger(__name__)
+# except Exception as e:
+#     raise Exception("Error Setting up logger") from e
 
-from utils import gear_preliminaries as gp
-from utils import gear_toolkit_command_line as gtkcl
-from collections import OrderedDict
-from utils import results
-import re
 
 def set_environment(environment):
     """sets the environment
