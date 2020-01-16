@@ -50,9 +50,9 @@ def set_environment(environment):
     # Set the current environment using the keys.  This will automatically be used with any sp.run() calls,
     # without the need to pass in env=...  Passing env= will unset all these variables, so don't use it if you do it
     # this way.
-    log('Setting Environment:')
+    log.info('Setting Environment:')
     for key in environment.keys():
-        log('{}: {}'.format(key, environment[key]))
+        log.info('{}: {}'.format(key, environment[key]))
         os.environ[key] = environment[key]
 
 
