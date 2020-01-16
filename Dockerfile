@@ -3,7 +3,7 @@
 #
 
 # Use Ubuntu 14.04 LTS
-FROM flywheel/hcp-base:dev
+FROM flywheel/hcp-base:0.1.0-dev
 
 LABEL maintainer="Flywheel <support@flywheel.io>"
 
