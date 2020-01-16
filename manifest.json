@@ -11,7 +11,7 @@
   "version": "test",
   "custom": {
     "gear-builder": {
-      "image": "flywheel/hcp-base:0.1.0_4.0.1",
+      "image": "flywheel/hcp-icafix:dev",
       "category": "analysis"
     },
       "flywheel": {
