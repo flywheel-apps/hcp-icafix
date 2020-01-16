@@ -203,12 +203,12 @@ def support_geardict(context, subid, funcname, output_zip_name, exclude_from_out
     context.gear_dict['exclude_from_output'] = exclude_from_output
     context.gear_dict['metadata'] = {}
 
-if __name__ == '__main__':
-    
+
+def main():
     with flywheel.gear_context.GearContext() as context:
-        
+
         context.custom_dict = {}
-        
+
         # Log the config settings
         try:
             context.log_config()  # not configuring the log but logging the config
@@ -217,7 +217,6 @@ if __name__ == '__main__':
             log.warning('logging context failed')
             # os.sys.exit(1)
 
-
         # Setup the environment
         try:
             environment = setup_icafix_environment()
@@ -225,14 +224,12 @@ if __name__ == '__main__':
             log.exception(e)
             log.warning('setting environment failed')
 
-
         # Set the subject ID
         try:
             gp.set_subject(context)
         except Exception as e:
             log.exception(e)
             log.warning('setting subject failed')
-
 
         # Check the input files
         try:
@@ -256,7 +253,6 @@ if __name__ == '__main__':
             log.fatal('Checking zip files failed')
             os.sys.exit(1)
 
-
         # Make sure the correct file is in the zipped archives 
         try:
             work_file, func_name = check_input_files(context.work_dir, zip_contents)
@@ -264,7 +260,6 @@ if __name__ == '__main__':
             log.exception(e)
             log.fatal('Unable to locate correct functional file')
             os.sys.exit(1)
-
 
         # Unzip the files
         try:
@@ -276,11 +271,10 @@ if __name__ == '__main__':
             log.exception(e)
             log.fatal('Unzipping HCP scruct and func zips failed')
             os.sys.exit(1)
-        
-        
+
         # Generate the run command
         try:
-            command = [environment['HCPPIPEDIR']+'/ICAFIX/hcp_fix']
+            command = [environment['HCPPIPEDIR'] + '/ICAFIX/hcp_fix']
             call_dict = generate_ica_call_dict(work_file, context)
             command = gtkcl.build_command_list(command, call_dict, include_keys=False)
             log.info('The following command will be executed:')
@@ -289,8 +283,7 @@ if __name__ == '__main__':
             log.exception(e)
             log.fatal('Generating command call failed')
             os.sys.exit(1)
-        
-        
+
         # Execute the run command
         try:
             gtkcl.exec_command(command, env=environment)
@@ -299,30 +292,29 @@ if __name__ == '__main__':
             log.fatal('HCP-ICAFIX failed')
             os.sys.exit(1)
 
-
         # Generate post-fix scene command
         try:
             command = ['${HCPPIPEDIR}/ICAFIX/PostFix.sh']
-            call_dict = generage_postica_call_dict(context.work_dir, context.config['Subject'], func_name, context.config['HighPassFilter'])
+            call_dict = generage_postica_call_dict(context.work_dir, context.config['Subject'], func_name,
+                                                   context.config['HighPassFilter'])
             command = gtkcl.build_command_list(command, call_dict, include_keys=True)
             log.info('The following command will be executed:')
             log.info(' '.join(command))
         except Exception as e:
             log.exception(e)
             log.error('Generating post-fix command failed')
-        
-        
+
         # Execute the run command
         try:
             gtkcl.exec_command(command, env=environment)
         except Exception as e:
             log.exception(e)
             log.error('POST-HCP-ICAFIX failed')
-        
+
         # Set the output zip name
-        output_zip_name = pathlib.Path(context.output_dir).joinpath('{}_hcpicafix.zip'.format(context.config['Subject']))
-        
-        
+        output_zip_name = pathlib.Path(context.output_dir).joinpath(
+            '{}_hcpicafix.zip'.format(context.config['Subject']))
+
         # Needs to be run to support context.custom_dict bullshit 
         try:
             support_geardict(context, context.config['Subject'], func_name, output_zip_name, zip_contents)
@@ -330,8 +322,7 @@ if __name__ == '__main__':
             log.exception(e)
             log.error('Legacy context.custom_dict support failed')
             os.sys.exit(1)
-            
-        
+
         # Now we can the gear cleanup and file zipping
         try:
             results.cleanup(context)
@@ -339,6 +330,12 @@ if __name__ == '__main__':
             log.exception(e)
             log.error('Output file zipping failed')
             os.sys.exit(1)
-            
+
         log.info('Finished')
+
+
+if __name__ == '__main__':
+    
+    main()
+    
 
