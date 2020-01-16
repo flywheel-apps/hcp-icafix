@@ -97,7 +97,6 @@ RUN FSL_FIX_R_CMD=` which R `
 #############################################
 # Download and install FSL ICA-FIX
 ENV DEBIAN_FRONTEND=noninteractive 
-RUN apt-get install keyboard-configuration
 RUN apt-get -y update && \
     apt-get install -y wget && \
     wget -nv http://www.fmrib.ox.ac.uk/~steve/ftp/fix-1.06.12.tar.gz -O /fix.tar.gz && \
