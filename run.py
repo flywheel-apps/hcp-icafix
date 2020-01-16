@@ -15,14 +15,14 @@ from utils import results
 import re
 import logging
 
-#### Setup logging as per SSE best practices
-try:
-
-    FORMAT = "[ %(asctime)8s%(levelname)8s%(filename)s:%(lineno)s - %(funcName)8s() ] %(message)s"
-    logging.basicConfig(format=FORMAT)
-    log = logging.getLogger()
-except Exception as e:
-    raise Exception("Error Setting up logger") from e
+# #### Setup logging as per SSE best practices
+# try:
+# 
+#     FORMAT = "[ %(asctime)8s%(levelname)8s%(filename)s:%(lineno)s - %(funcName)8s() ] %(message)s"
+#     logging.basicConfig(format=FORMAT)
+#     log = logging.getLogger()
+# except Exception as e:
+#     raise Exception("Error Setting up logger") from e
 
 ##-------- Standard Flywheel Gear Structure --------##
 flywheelv0 = "/flywheel/v0"
@@ -31,9 +31,9 @@ environ_json = '/tmp/gear_environ.json'
 #### Setup logging as per SSE best practices
 try:
 
-    FORMAT = "[ %(asctime)5s%(levelname)5s%(pathname)s:%(lineno)s - %(funcName)8s() ] %(message)s"
+    FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)s:%(lineno)s - %(funcName)8s() ] %(message)s"
     logging.basicConfig(format=FORMAT)
-    log = logging.getLogger()
+    log = logging.getLogger('root')
 except Exception as e:
     raise Exception("Error Setting up logger") from e
 
@@ -208,6 +208,7 @@ if __name__ == '__main__':
     
     with flywheel.gear_context.GearContext() as context:
         
+        context.custom_dict = {}
         
         # Log the config settings
         try:

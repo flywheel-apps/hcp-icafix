@@ -82,13 +82,13 @@
     "functional_zip": {
       "description": "Select functional run for ICA",
       "base": "file",
-      "optional": true
+      "optional": false
     },
    
     "structural_zip": {
       "description": "Select structural zip for the functional data",
       "base": "file",
-      "optional": true
+      "optional": false
     }
 
   },
