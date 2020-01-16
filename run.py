@@ -31,7 +31,7 @@ try:
 
     FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
     logging.basicConfig(format=FORMAT)
-    log = logging.getLogger(__name__)
+    log = logging.getLogger()
 except Exception as e:
     raise Exception("Error Setting up logger") from e
 
