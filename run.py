@@ -30,7 +30,7 @@ environ_json = '/tmp/gear_environ.json'
 #### Setup logging as per SSE best practices
 try:
 
-    FORMAT = "[ %(asctime)5s%(levelname)15s%(pathname)s:%(lineno)s - %(funcName)8s() ] %(message)s"
+    FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
     logging.basicConfig(format=FORMAT)
     log = logging.getLogger(__name__)
 except Exception as e:
