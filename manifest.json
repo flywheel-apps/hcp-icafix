@@ -21,7 +21,7 @@
   "flywheel": "0",
   "config": {
      "gear-log-level": {
-      "default": "DEBUG",
+      "default": "INFO",
       "description": "Gear Log verbosity level (ERROR|WARNING|INFO|DEBUG)",
       "type": "string",
       "enum": [

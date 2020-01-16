@@ -244,20 +244,21 @@ def main():
             
             struct_base = struct_zip.parent
             log.info(list(struct_base.glob('*')))
-            
-            
+            print(list(struct_base.glob('*')))
+            print('struct Path: {}'.format(struct_zip))
+            print('func Path: {}'.format(func_zip))
             
             
             zip_contents = []
             config_files = []
 
             log.info('Checking structural zip files')
-            contents, config = gp.preprocess_hcp_zip(struct_zip)
+            contents, config = gp.preprocess_hcp_zip(struct_zip.as_posix())
             zip_contents.extend(contents)
             config_files.append(config_files)
 
             log.info('Checking functional zip files')
-            contents, config = gp.preprocess_hcp_zip(func_zip)
+            contents, config = gp.preprocess_hcp_zip(func_zip.as_posix())
             zip_contents.extend(contents)
             config_files.append(config_files)
         except Exception as e:
