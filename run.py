@@ -129,8 +129,7 @@ def check_input_files(workdir, zip_files):
 
     # HCP expects the functional file to have the same name as it's parent directory (MNINonLinear/Results/func_scan/func_scan.nii.gz)
     func_base = matches[0]
-    func_file = pathlib.PurePath(base, '/MNINonLinear', '/Results', '/{}'.format(func_base),
-                                 '/{}.nii.gz'.format(func_base))
+    func_file = pathlib.PurePath(base).joinpath('MNINonLinear', 'Results', 'func_base','{}.nii.gz'.format(func_base))
 
     # If it's not there, you're not following HCP protocols.  This is an HCP gear, it runs on HCP directories, not your
     # Poorly organized garbage.
