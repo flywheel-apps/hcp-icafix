@@ -13,6 +13,16 @@ from utils import gear_toolkit_command_line as gtkcl
 from collections import OrderedDict
 from utils import results
 import re
+import logging
+
+#### Setup logging as per SSE best practices
+try:
+
+    FORMAT = "[ %(asctime)8s%(levelname)8s%(filename)s:%(lineno)s - %(funcName)8s() ] %(message)s"
+    logging.basicConfig(format=FORMAT)
+    log = logging.getLogger()
+except Exception as e:
+    raise Exception("Error Setting up logger") from e
 
 ##-------- Standard Flywheel Gear Structure --------##
 flywheelv0 = "/flywheel/v0"
