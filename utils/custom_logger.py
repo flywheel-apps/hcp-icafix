@@ -1,37 +1,48 @@
-import logging
 import sys
 import time
+import logging
 
-def log_config(context):
-    config = context.config
-    inputs = context._invocation['inputs']
-    context.log.info('\n\nThe following inputs are used:')
-    for key in inputs.keys():
-        if key == 'api-key':
-            context.log.info('{}: *********'.format(key))
-        else:
-            context.log.info(
-                '{}: {}'.format(key,context.get_input_path(key))
-            )
-    context.log.info('\n\nThe following configuration parameters are set:')
-    for key in config.keys():
-        context.log.info(
-            '{}: {}'.format(key,context.config[key])
-        )
-    context.log.info('\n')
+log = logging.getLogger(__name__)
 
-def get_custom_logger(log_name):
+def get_custom_logger(context):
+    """
+    get_custom_logger is a customizable template for creating a logger.
+    
+    Args:
+        context (flywheel.gear_context.GearContext): The gear context object
+            containing the 'gear_dict' dictionary attribute with keys/values,
+            'manifest_json': The complete manifest dictionary. Must be 
+            initialized elsewhere. The manifest keys are used to configure the 
+            log configuration and how it displays.
+    
+    Returns:
+        logger: The log created with the logging configuration set accordingly
+    """    
+
     # Initialize Custom Logging
     # Timestamps with logging assist debugging algorithms
     # With long execution times
-    handler = logging.StreamHandler(stream=sys.stdout)
-    formatter = logging.Formatter(
-                fmt='%(levelname)s - %(name)-8s - %(asctime)s -  %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S')
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(log_name)
-    logger.propagate = False
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    manifest = context.gear_dict['manifest_json']
 
-    return logger
+    # Set suite (default to flywheel)
+    try:
+        suite = manifest['custom']['flywheel']['suite']
+    except KeyError:
+        suite = 'flywheel'
+
+    # Set gear_name
+    gear_name = manifest['name']
+
+    log_name = '/'.join([suite, gear_name])
+
+    log_level = logging.INFO
+
+
+    # Tweak the formatting
+    fmt = '%(asctime)s.%(msecs)03d %(levelname)-8s [%(name)s %(funcName)s()]: %(message)s'
+    dtfmt = '%Y-%m-%d %H:%M:%S'
+    logging.basicConfig(level=log_level, format=fmt, datefmt=dtfmt)
+    log = logging.getLogger(log_name)
+    log.critical('{} log level is {}'.format(log_name, log_level))
+
+    return log

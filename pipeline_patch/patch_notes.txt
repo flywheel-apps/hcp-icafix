@@ -1,8 +1,0 @@
-* hcp_fix needs to be based on HCP Pipeline version (to allow flexible classifier selection), but that is currently incomplete on github, so just fix it here
-* Current gear uses HCP pipeline commit 90b0766636ba83f06c9198206cc7fa90117b0b11 (8/24/2017) to avoid some bugs, so these scripts are modified from that version
-* re-compiled PostFix and RSS for MCR 2015a (v85)
-* RestingStateStats.sh modified:
-  - reference Compiled_RestingStateStats/run_* instead of Compiled_RestingStateStats/distrib/run_*
-  - use MCR in $MATLAB_COMPILER_RUNTIME from SetUpHCPPipeline.sh
-  - properly handle RegName=FS
-  - Use Movement_Regressors_demean.txt when available (for multi-run case)

@@ -32,20 +32,32 @@
       ]
     },
 
-    "HCP_TrainingData": {
+    "TrainingFile": {
       "type": "string",
       "default": "HCP_hp2000.RData",
+      "enum": ["HCP_hp2000.RData", 
+              "HCP7T_hp2000.RData",
+              "HCP_Style_Single_Multirun_Dedrift.RData",
+              "NHPHCP_Macaque_RIKEN30SRFIX.RData",
+              "Standard.RData",
+              "Standard_old.Rdata",
+              "UKBiobank.RData",
+              "WhII_MB6.RData",
+              "WhII_Standard.RData"],
       "description": "Name of FIX training file to use for classification. 'Standard', 'HCP_hp2000', 'HCP7T_hp2000', 'WhII_MB6', 'WhII_Standard', 'UKBiobank'. See https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide#Trained-weights_files for details."
     },
-    "domot": {
+    
+    "do_motion_regression": {
       "type": "boolean",
       "default": false,
       "description": "set whether or not to regress motion parameters (24 regressors) out of the data as part of FIX (TRUE or FALSE)"
     },
     "HighPassFilter": {
-      "type": "string",
-      "default": "2000",
-      "description": "set temporal highpass full-width (2*sigma) to use, in seconds, cannot be 0 for single-run FIX.  MR FIX also supports 0 for a linear detrend, or 'pdX', for a polynomial detrend of order X e.g., bandpass=pd1 is linear detrend (functionally equivalent to bandpass=0) bandpass=pd2 is a quadratic detrend"
+      "type": "integer",
+      "default": 2000, 
+      "minimum": 1,
+      "maximum": 9999,
+      "description": "set temporal highpass full-width (2*sigma) to use, in seconds, cannot be 0 for single-run FIX.  For detrending-like behaviour, set <highpass> to 2000"
     },
     "FixThreshold": {
       "type": "integer",

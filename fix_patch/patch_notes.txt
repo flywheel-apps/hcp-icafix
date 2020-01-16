@@ -1,2 +1,0 @@
-* settings.sh needs system-specific paths (to FSL-FIX and MCR)
-* re-compiled for MCR 2015a (v85)

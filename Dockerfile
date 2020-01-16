@@ -48,7 +48,7 @@ ENV MSMCONFIGDIR=${HCPPIPEDIR}/MSMConfig
 
 RUN apt-get install -y software-properties-common && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
-    add-apt-repository 'deb http://cran.rstudio.com/bin/linux/ubuntu xenial/'  && \
+    add-apt-repository 'deb http://cran.rstudio.com/bin/linux/ubuntu debian/'  && \
     apt-get update
 
 RUN apt-get install -y --no-install-recommends --allow-unauthenticated r-base-core=3.4.4-*  r-base-dev=3.4.4-*
@@ -102,7 +102,7 @@ RUN apt-get -y update && \
     wget -nv http://www.fmrib.ox.ac.uk/~steve/ftp/fix-1.06.12.tar.gz -O /fix.tar.gz && \
     mkdir -p /tmp/fix && \
     cd /tmp/fix && \
-    tar zxvf /fix.tar.gz --exclude="compiled/"  --exclude="MCRInstaller.zip" && \
+    tar zxvf /fix.tar.gz && \
     mv /tmp/fix/fix* /opt/fix && \
     rm /fix.tar.gz && \
     cd / && \
@@ -119,7 +119,6 @@ ENV FSL_FIXDIR=/opt/fix
 RUN apt-get -qq update && apt-get -qq install -y \
     unzip \
     xorg \
-    wget \
     curl && \
     mkdir /mcr-install && \
     mkdir /opt/mcr && \
