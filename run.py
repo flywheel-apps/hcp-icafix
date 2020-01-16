@@ -30,7 +30,7 @@ environ_json = '/tmp/gear_environ.json'
 try:
 
     FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
-    logging.basicConfig(format=FORMAT)
+    logging.basicConfig(level='DEBUG',format=FORMAT)
     log = logging.getLogger()
 except Exception as e:
     raise Exception("Error Setting up logger") from e
