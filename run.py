@@ -254,6 +254,7 @@ def main():
 
             log.info('Checking structural zip files')
             contents, config = gp.preprocess_hcp_zip(struct_zip.as_posix())
+            print(contents)
             zip_contents.extend(contents)
             config_files.append(config_files)
 
