@@ -154,9 +154,9 @@ def generate_ica_call_dict(input_file, context):
     fix_threshold = context.config['FixThreshold']
     del_intermediates = context.config['DeleteIntermediates']
 
-    call_dict = OrderedDict([('input', input_file), ('highpass', highpass), ('mot_reg', mot_reg),
+    call_dict = OrderedDict([('input', input_file), ('highpass', highpass), ('mot_reg', str(mot_reg).upper()),
                              ('training_file', training_file), ('fix_threshold', fix_threshold),
-                             ('del_intermediate', del_intermediates)])
+                             ('del_intermediate', str(del_intermediates).upper())])
 
     return (call_dict)
 
@@ -181,7 +181,7 @@ def generage_postica_call_dict(study_folder, subject, fMRIname, highpass):
     
     call_dict = OrderedDict([('study-folder', study_folder), ('subject', subject), ('fmri-name',fMRIname),
                              ('high-pass', highpass), ('template-scene-dual-screen', dual_scene),
-                             ('template-scene-single-screen', single_scene), ('reuse-high-pass', reuse_high_pass),
+                             ('template-scene-single-screen', single_scene), ('reuse-high-pass', str(reuse_high_pass).upper()),
                              ('matlab-run-mode', matlab_mode)])
     
     return(call_dict)
