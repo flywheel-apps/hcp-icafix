@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
-import os, os.path as op
+import os
 import json
-import subprocess as sp
-import shutil
 import pathlib
 import numpy as np
-
 import flywheel
-from utils import gear_preliminaries as gp
-from utils import gear_toolkit_command_line as gtkcl
-from collections import OrderedDict
-from utils import results
-import re
+
 import logging
 
 # #### Setup logging as per SSE best practices
@@ -36,6 +29,11 @@ try:
 except Exception as e:
     raise Exception("Error Setting up logger") from e
 
+from utils import gear_preliminaries as gp
+from utils import gear_toolkit_command_line as gtkcl
+from collections import OrderedDict
+from utils import results
+import re
 
 def set_environment(environment):
     """sets the environment
