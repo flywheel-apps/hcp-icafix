@@ -158,9 +158,6 @@ COPY run.py ${FLYWHEEL}/run.py
 COPY utils ${FLYWHEEL}/utils
 COPY manifest.json ${FLYWHEEL}/manifest.json
 
-# Copy additional scripts and scenes
-COPY scripts /tmp/scripts
-
 
 # Set up directories for HCP fix
 RUN mkdir -p /opt/fmrib/MATLAB
