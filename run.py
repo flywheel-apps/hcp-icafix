@@ -24,16 +24,16 @@ import logging
 flywheelv0 = "/flywheel/v0"
 environ_json = '/tmp/gear_environ.json'
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
-# #### Setup logging as per SSE best practices
-# try:
-# 
-#     FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
-#     logging.basicConfig(format=FORMAT)
-#     log = logging.getLogger(__name__)
-# except Exception as e:
-#     raise Exception("Error Setting up logger") from e
+#### Setup logging as per SSE best practices
+try:
+
+    FORMAT = "[ %(asctime)5s%(levelname)10s%(pathname)5s:%(lineno)s - %(funcName)8s() ] %(message)s"
+    logging.basicConfig(format=FORMAT)
+    log = logging.getLogger(__name__)
+except Exception as e:
+    raise Exception("Error Setting up logger") from e
 
 
 def set_environment(environment):
