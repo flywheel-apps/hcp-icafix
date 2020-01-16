@@ -298,7 +298,7 @@ def main():
 
         # Execute the run command
         try:
-            gtkcl.exec_command(command, env=environment)
+            gtkcl.exec_command(command, environ=environment)
         except Exception as e:
             log.exception(e)
             log.fatal('HCP-ICAFIX failed')
@@ -318,7 +318,7 @@ def main():
 
         # Execute the run command
         try:
-            gtkcl.exec_command(command, env=environment)
+            gtkcl.exec_command(command, environ=environment)
         except Exception as e:
             log.exception(e)
             log.error('POST-HCP-ICAFIX failed')
