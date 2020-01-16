@@ -236,7 +236,11 @@ def main():
         try:
             struct_zip = context.get_input_path('structural_zip')
             func_zip = context.get_input_path('functional_zip')
-
+            log.debug('struct Path: {}'.format(struct_zip))
+            log.debug('func Path: {}'.format(func_zip))
+            
+            
+            
             zip_contents = []
             config_files = []
 
