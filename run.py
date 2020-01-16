@@ -225,7 +225,9 @@ def main():
 
         # Set the subject ID
         try:
-            gp.set_subject(context)
+            #gp.set_subject(context)
+            # for testing purposes:
+            context.config['Subject'] = 'TOME_3024'
         except Exception as e:
             log.exception(e)
             log.warning('setting subject failed')
