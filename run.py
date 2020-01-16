@@ -207,7 +207,7 @@ def main():
         
         
         
-        context.gear_dict = {}
+        context.gear_dict = {'dry-run':False}
 
         # Log the config settings
         try:
