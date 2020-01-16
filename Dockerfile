@@ -171,7 +171,7 @@ RUN ln -s /opt/mcr /opt/fmrib/MATLAB/MATLAB_Compiler_Runtime
 RUN python -c 'import os, json; f = open("/tmp/gear_environ.json", "w"); json.dump(dict(os.environ), f)'
 
 #ENV LD_LIBRARY_PATH /opt/mcr/v90/runtime/glnxa64:/opt/mcr/v90/bin/glnxa64:/opt/mcr/v90/sys/os/glnxa64:/opt/mcr/v90/extern/bin/glnxa64
-
+RUN PATH=$PATH:$CARET7DIR
 
 # Configure entrypoint
 ENTRYPOINT ["/flywheel/v0/run.py"]
