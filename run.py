@@ -206,7 +206,7 @@ def support_geardict(context, subid, funcname, output_zip_name, exclude_from_out
 def main():
     with flywheel.gear_context.GearContext() as context:
 
-        context.custom_dict = {}
+        context.gear_dict = {}
 
         # Log the config settings
         try:
