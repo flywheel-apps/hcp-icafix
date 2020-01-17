@@ -92,8 +92,10 @@ def setup_icafix_environment():
         '/opt/mcr/{0}/runtime/glnxa64:/opt/mcr/{0}/bin/glnxa64:/opt/mcr/{0}/sys/os/glnxa64:/opt/mcr/{0}/extern/bin/glnxa64:$LD_LIBRARY_PATH'.format(
             mcr)
     environment_dict['MATLAB_COMPILER_RUNTIME'] = '/opt/mcr/{}'.format(mcr)
+    environment_dict['FSL_FIX_MATLAB'] = '/opt/mcr/{}'.format(mcr)
     environment_dict['FSL_FIX_MATLAB_MODE'] = '0'
     environment_dict['FSL_FIX_MCRROOT'] = '/opt/mcr/{}'.format(mcr)
+    environment_dict['FSL_FIX_MCR'] = '/opt/mcr/{}'.format(mcr)
 
     # Set up HCP environment variables
     environment_dict['DEFAULT_ENVIRONMENT_SCRIPT'] = '/flywheel/v0/scripts/SetUpHCPPipeline.sh'
