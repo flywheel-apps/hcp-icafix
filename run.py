@@ -354,6 +354,6 @@ if __name__ == '__main__':
     try:
         main()
     finally:
-        shutil.copy('/flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL_hp2000.ica')
+        shutil.copy('/flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL_hp2000.ica','/flywheel/v0/output')
     
 
