@@ -102,8 +102,8 @@ def setup_icafix_environment():
     environment_dict['DEFAULT_ENVIRONMENT_SCRIPT'] = '/flywheel/v0/scripts/SetUpHCPPipeline.sh'
     environment_dict['DEFAULT_RUN_LOCAL'] = 'TRUE'
     environment_dict['DEFAULT_FIXDIR'] = '/opt/fix'
-    os.system('. /opt/HCP-Pipelines/Examples/Scripts/SetUpHCPPipeline.sh')
     set_environment(environment_dict)
+    os.system('source "$HCPPIPEDIR/global/scripts/finish_hcpsetup.shlib"')
     return (environment_dict)
 
 
