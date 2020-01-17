@@ -10,6 +10,7 @@ from collections import OrderedDict
 from utils import results
 import re
 import logging
+import shutil
 
 # #### Setup logging as per SSE best practices
 # try:
@@ -350,6 +351,9 @@ def main():
 
 if __name__ == '__main__':
     
-    main()
+    try:
+        main()
+    finally:
+        shutil.copy('/flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL_hp2000.ica')
     
 
