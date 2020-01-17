@@ -162,6 +162,7 @@ COPY manifest.json ${FLYWHEEL}/manifest.json
 # Set up directories for HCP fix
 RUN mkdir -p /opt/fmrib/MATLAB
 RUN ln -s /opt/mcr /opt/fmrib/MATLAB/MATLAB_Compiler_Runtime
+RUN ln -s /usr/share/fsl/6.0 /opt/fmrib/fsl
 
 
 # ENV preservation for Flywheel Engine
