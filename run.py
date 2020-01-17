@@ -53,7 +53,7 @@ def set_environment(environment):
     # this way.
     log.info('Setting Environment:')
     for key in environment.keys():
-        log.info('{}: {}'.format(key, environment[key]))
+        log.debug('{}: {}'.format(key, environment[key]))
         os.environ[key] = environment[key]
 
 
@@ -111,7 +111,6 @@ def check_input_files(workdir, zip_files):
     # Look for the fMRI file in the specified location
     example = pathlib.Path(zip_files[0])
     base = example.parts[0]
-    log.info('{}'.format(base))
     # Following HCP directory structure, input fMRI should be preprocessed and in the MNINonLinear/Results directory
     rx = '.*MNINonLinear\/Results\/([a-zA-Z0-9_]+)\/.*'
 
@@ -133,7 +132,6 @@ def check_input_files(workdir, zip_files):
     # HCP expects the functional file to have the same name as it's parent directory (MNINonLinear/Results/func_scan/func_scan.nii.gz)
     func_base = matches[0]
     func_file = pathlib.PurePath(base).joinpath('MNINonLinear', 'Results', func_base,'{}.nii.gz'.format(func_base))
-    log.info(zip_files[0])
     # If it's not there, you're not following HCP protocols.  This is an HCP gear, it runs on HCP directories, not your
     # Poorly organized garbage.
     if not func_file.as_posix() in zip_files:
@@ -240,8 +238,8 @@ def main():
         try:
             struct_zip = pathlib.Path(context.get_input_path('structural_zip'))
             func_zip = pathlib.Path(context.get_input_path('functional_zip'))
-            log.info('struct Path: {}'.format(struct_zip))
-            log.info('func Path: {}'.format(func_zip))
+            log.debug('struct Path: {}'.format(struct_zip))
+            log.debug('func Path: {}'.format(func_zip))
             
             # struct_base = struct_zip.parent
             # log.info(list(struct_base.glob('*')))
