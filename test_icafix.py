@@ -22,6 +22,9 @@ struct_zip = '/flywheel/v0/input/TOME_3024_hcpstruct.zip'
 func_zip = '/flywheel/v0/input/TOME_3024_rfMRI_REST1_RL_hcpfunc.zip'
 
 
+class context():
+    def __init__(self):
+        self.gear_dict={}
 
 
 cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL.nii.gz 2000 TRUE HCP_hp2000.RData 10'
@@ -30,7 +33,8 @@ if not os.path.exists(work_dir):
     os.mkdir(work_dir)
     
 zip_file_list, config = gp.preprocess_hcp_zip(struct_zip)
-
-gp.unzip_hcp(False,work_dir,struct_zip)
-gp.unzip_hcp(False,work_dir,func_zip)
+context = context()
+context.gear_dict['dry-run'] = False
+gp.unzip_hcp(context,struct_zip)
+gp.unzip_hcp(context,func_zip)
 
