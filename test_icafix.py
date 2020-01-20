@@ -25,7 +25,7 @@ func_zip = '/flywheel/v0/input/TOME_3024_rfMRI_REST1_RL_hcpfunc.zip'
 class context():
     def __init__(self):
         self.gear_dict={}
-
+        self.work_dir = '/flywheel/v0/work'
 
 cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL.nii.gz 2000 TRUE HCP_hp2000.RData 10'
 work_dir = '/flywheel/v0/work'
