@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-from gear_utils import gear_preliminaries as gp
+from utils import gear_preliminaries as gp
 
 # tfMRI:
 # rfMRI_REST1_RL + LR
