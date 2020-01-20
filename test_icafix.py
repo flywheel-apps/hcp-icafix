@@ -21,7 +21,8 @@ from utils import gear_preliminaries as gp
 struct_zip = '/flywheel/v0/input/TOME_3024_hcpstruct.zip'
 func_zip = '/flywheel/v0/input/TOME_3024_rfMRI_REST1_RL_hcpfunc.zip'
 
-
+struct_zip = '/flywheel/v0/input/100307_3T_Structural_preproc.zip'
+func_zip = '/flywheel/v0/input/100307_3T_rfMRI_REST1_preproc.zip'
 class context():
     def __init__(self):
         self.gear_dict={}
