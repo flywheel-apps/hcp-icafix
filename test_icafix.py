@@ -33,7 +33,7 @@ work_dir = '/flywheel/v0/work'
 if not os.path.exists(work_dir):
     os.mkdir(work_dir)
     
-zip_file_list, config = gp.preprocess_hcp_zip(struct_zip)
+# zip_file_list, config = gp.preprocess_hcp_zip(struct_zip)
 context = context()
 context.gear_dict['dry-run'] = False
 gp.unzip_hcp(context,struct_zip)
