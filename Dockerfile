@@ -59,6 +59,7 @@ RUN apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-de
 
 RUN Rscript -e 'install.packages("devtools",dependencies = TRUE)'
 RUN Rscript -e 'require(devtools);install_version("kernlab",version = "0.9-24", repos="http://cran.us.r-project.org")'
+RUN Rscript -e 'require(devtools);install_version("caTools",version = "1.17-13", repos="http://cran.us.r-project.org")'
 RUN Rscript -e 'require(devtools);install_version("ROCR",version = "1.0-7", repos="http://cran.us.r-project.org")'
 RUN Rscript -e 'require(devtools);install_version("class",version = "7.3-14", repos="http://cran.us.r-project.org")'
 
@@ -123,7 +124,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     mkdir /mcr-install && \
     mkdir /opt/mcr && \
     cd /mcr-install && \
-    wget -nv http://www.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip && \
+    wget -nv https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip && \
     cd /mcr-install && \
     unzip -q MCR_R2017b_glnxa64_installer.zip && \
     ./install -destinationFolder /opt/mcr -agreeToLicense yes -mode silent && \
