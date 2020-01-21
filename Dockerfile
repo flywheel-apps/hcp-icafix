@@ -59,7 +59,7 @@ RUN apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-de
 
 RUN Rscript -e 'install.packages("devtools",dependencies = TRUE)'
 RUN Rscript -e 'require(devtools);install_version("kernlab",version = "0.9-24", repos="http://cran.us.r-project.org")'
-RUN Rscript -e 'require(devtools);install_version("caTools",version = "1.17-13", repos="http://cran.us.r-project.org")'
+RUN Rscript -e 'require(devtools);install_version("caTools",version = "1.17.1.3", repos="http://cran.us.r-project.org")'
 RUN Rscript -e 'require(devtools);install_version("ROCR",version = "1.0-7", repos="http://cran.us.r-project.org")'
 RUN Rscript -e 'require(devtools);install_version("class",version = "7.3-14", repos="http://cran.us.r-project.org")'
 
