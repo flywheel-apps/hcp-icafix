@@ -48,7 +48,7 @@ ENV MSMCONFIGDIR=${HCPPIPEDIR}/MSMConfig
 
 RUN apt-get install -y software-properties-common && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
-    add-apt-repository 'deb http://cran.rstudio.com/bin/linux/ubuntu xenial/'  && \
+    add-apt-repository 'deb http://cran.us.r-project.org/bin/linux/ubuntu xenial/'  && \
     apt-get update
 
 RUN apt-get install -y --no-install-recommends --allow-unauthenticated r-base-core=3.4.4-*  r-base-dev=3.4.4-*
