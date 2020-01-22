@@ -29,6 +29,7 @@ class context():
         self.work_dir = '/flywheel/v0/work'
 
 cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL.nii.gz 2000 TRUE HCP_hp2000.RData 10'
+cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/100307/MNINonLinear/Results/rfMRI_REST1_LR/rfMRI_REST1_LR.nii.gz 2000 TRUE HCP_hp2000.RData 10'
 work_dir = '/flywheel/v0/work'
 if not os.path.exists(work_dir):
     os.mkdir(work_dir)

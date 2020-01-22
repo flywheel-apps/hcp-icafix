@@ -104,6 +104,8 @@ def setup_icafix_environment():
     environment_dict['DEFAULT_FIXDIR'] = '/opt/fix'
     set_environment(environment_dict)
     os.system('source "$HCPPIPEDIR/global/scripts/finish_hcpsetup.shlib"')
+    
+    
     return (environment_dict)
 
 

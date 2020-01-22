@@ -165,12 +165,28 @@ RUN mkdir -p /opt/fmrib/MATLAB
 RUN ln -s /opt/mcr /opt/fmrib/MATLAB/MATLAB_Compiler_Runtime
 RUN ln -s /usr/share/fsl/6.0 /opt/fmrib/fsl
 
+ENV HCP_DIR=/flywheel/v0/hcp_dir
+ENV SCRIPT_DIR=/flywheel/v0/scripts/scripts
+ENV SCENE_DIR=/flywheel/v0/scripts/PostFixScenes
+ENV HCP_PIPELINE_DIR=/opt/HCP-Pipelines
+
+ENV MATLAB_COMPILER_RUNTIME=/opt/mcr/v93
+ENV FSL_FIX_MATLAB=/opt/mcr/v93
+ENV FSL_FIX_MATLAB_MODE=0
+ENV FSL_FIX_MCRROOT=/opt/mcr/v93
+ENV FSL_FIX_MCR=/opt/mcr/v93
+
+    # Set up HCP environment variables
+ENV DEFAULT_ENVIRONMENT_SCRIPT=/flywheel/v0/scripts/SetUpHCPPipeline.sh
+ENV DEFAULT_RUN_LOCAL=TRUE
+ENV DEFAULT_FIXDIR=/opt/fix
+
 
 # ENV preservation for Flywheel Engine
 ENV PATH=$PATH:$CARET7DIR
 RUN python -c 'import os, json; f = open("/tmp/gear_environ.json", "w"); json.dump(dict(os.environ), f)'
 
-#ENV LD_LIBRARY_PATH /opt/mcr/v90/runtime/glnxa64:/opt/mcr/v90/bin/glnxa64:/opt/mcr/v90/sys/os/glnxa64:/opt/mcr/v90/extern/bin/glnxa64
+#ENV LD_LIBRARY_PATH=/opt/mcr/v93/runtime/glnxa64:/opt/mcr/v93/bin/glnxa64:/opt/mcr/v93/sys/os/glnxa64:/opt/mcr/v93/extern/bin/glnxa64
 
 
 # Configure entrypoint
