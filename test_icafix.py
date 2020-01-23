@@ -28,6 +28,10 @@ class context():
         self.gear_dict={}
         self.work_dir = '/flywheel/v0/work'
 
+
+
+LD_LIBRARY_PATH=/opt/mcr/v93/runtime/glnxa64:/opt/mcr/v93/bin/glnxa64:/opt/mcr/v93/sys/os/glnxa64:/opt/mcr/v93/extern/bin/glnxa64:$LD_LIBRARY_PATH
+
 cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/TOME_3024/MNINonLinear/Results/rfMRI_REST1_RL/rfMRI_REST1_RL.nii.gz 2000 TRUE HCP_hp2000.RData 10'
 cmd='${HCPPIPEDIR}/ICAFIX/hcp_fix /flywheel/v0/work/100307/MNINonLinear/Results/rfMRI_REST1_LR/rfMRI_REST1_LR.nii.gz 2000 TRUE HCP_hp2000.RData 10'
 work_dir = '/flywheel/v0/work'

@@ -173,14 +173,16 @@ ENV HCP_PIPELINE_DIR=/opt/HCP-Pipelines
 ENV MATLAB_COMPILER_RUNTIME=/opt/mcr/v93
 ENV FSL_FIX_MATLAB=/opt/mcr/v93
 ENV FSL_FIX_MATLAB_MODE=0
-ENV FSL_FIX_MCRROOT=/opt/mcr/v93
+ENV FSL_FIX_MCRROOT=/opt/mcr
 ENV FSL_FIX_MCR=/opt/mcr/v93
-
+ENV FSL_FIX_MCRV=v93
     # Set up HCP environment variables
 ENV DEFAULT_ENVIRONMENT_SCRIPT=/flywheel/v0/scripts/SetUpHCPPipeline.sh
 ENV DEFAULT_RUN_LOCAL=TRUE
 ENV DEFAULT_FIXDIR=/opt/fix
 
+ENV FSL_FIX_WBC=/opt/workbench/bin_linux64/wb_command
+ENV FSL_FIX_R_CMD=/usr/bin/R
 
 # ENV preservation for Flywheel Engine
 ENV PATH=$PATH:$CARET7DIR
