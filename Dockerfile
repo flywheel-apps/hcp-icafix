@@ -7,6 +7,10 @@ FROM ubuntu:trusty-20170817
 
 MAINTAINER Flywheel <support@flywheel.io>
 
+RUN rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt && \
+     update-ca-certificates
+ENV REQUESTS_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
+
 # Install packages
 RUN apt-get update \
     && apt-get install -y \
@@ -112,15 +116,16 @@ RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
 
 # Configure FSL environment
 ENV FSLDIR=/usr/local/fsl
-ENV FSL_DIR="${FSLDIR}"
-ENV FSLOUTPUTTYPE=NIFTI_GZ
-ENV PATH=/usr/local/fsl/bin:$PATH
-ENV FSLMULTIFILEQUIT=TRUE
-ENV POSSUMDIR=/usr/local/fsl/
-ENV LD_LIBRARY_PATH=/usr/local/fsl/lib:$LD_LIBRARY_PATH
-ENV FSLTCLSH=/usr/bin/tclsh
-ENV FSLWISH=/usr/bin/wish
-ENV FSLOUTPUTTYPE=NIFTI_GZ
+    FSL_DIR="${FSLDIR}"
+    FSLOUTPUTTYPE=NIFTI_GZ
+    PATH=/usr/local/fsl/bin:$PATH
+    FSLMULTIFILEQUIT=TRUE
+    POSSUMDIR=/usr/local/fsl/
+    LD_LIBRARY_PATH=/usr/local/fsl/lib:$LD_LIBRARY_PATH
+    FSLTCLSH=/usr/bin/tclsh
+    FSLWISH=/usr/bin/wish
+    FSLOUTPUTTYPE=NIFTI_GZ
+
 
 #############################################
 # Download and install Connectome Workbench
