@@ -129,17 +129,25 @@ RUN Rscript -e 'require(devtools);install_version("randomForest",version = "4.6-
 #install_version("randomForest", version="4.6-12")
 
 #############################################
-# CUSTOML NEWER METHOD for FSL-FIX INSTALL
+# CUSTOML NEWER METHOD for FSL-FIX INSTALL -- NO!! Does not contain compiled env
 RUN rm -vfR /var/lib/apt/lists/* \
     && apt-get update \
     && apt-get install -y -q --no-install-recommends git
 
-RUN git clone https://git.fmrib.ox.ac.uk/fsl/fix.git \
+#RUN git clone https://git.fmrib.ox.ac.uk/fsl/fix.git \
+#    && fixVersion=1.06.15 \
+#    && mv fix /opt/fix-${fixVersion} \
+#    && rm -f /opt/fix \
+#    && ln -s /opt/fix-${fixVersion} /opt/fix \
+#    && rm -rf fix
+
+RUN wget http://www.fmrib.ox.ac.uk/~steve/ftp/fix.tar.gz \
+    && tar -zxvf fix.tar.gz \
     && fixVersion=1.06.15 \
     && mv fix /opt/fix-${fixVersion} \
     && rm -f /opt/fix \
     && ln -s /opt/fix-${fixVersion} /opt/fix \
-    && rm -rf fix
+    && rm -rf fix.tar.gz
 
 ENV PATH="/opt/fix:$PATH" \
     FSL_FIXDIR=/opt/fix
@@ -170,23 +178,40 @@ RUN sed -i -e 's+FSL_FIX_R_CMD="${FSLDIR}/fslpython/envs/fslpython/bin/R"+FSL_FI
 # See http://www.mathworks.com/products/compiler/mcr/ for more info.
 # Adapted from https://github.com/flywheel-apps/matlab-mcr
 
+#update for possible resolution to java issue
+# Install OpenJDK-8
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y ant && \
+    apt-get clean;
+
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f;
+
+# Setup JAVA_HOME -- useful for docker commandline
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+
 RUN apt-get -qq update && apt-get -qq install -y \
     unzip \
     xorg \
+    wget \
     curl && \
     mkdir /mcr-install && \
     mkdir /opt/mcr && \
     cd /mcr-install && \
-    wget -nv https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip && \
+    wget http://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip && \
     cd /mcr-install && \
     unzip -q MCR_R2017b_glnxa64_installer.zip && \
     ./install -destinationFolder /opt/mcr -agreeToLicense yes -mode silent && \
     cd / && \
     rm -rf mcr-install
 
-#ENV LD_LIBRARY_PATH /opt/mcr/v85/runtime/glnxa64:/opt/mcr/v85/bin/glnxa64:/opt/mcr/v85/sys/os/glnxa64 #skip this
-#ENV XAPPLRESDIR /opt/mcr/v93/X11/app-defaults
-
+# Configure environment variables for MCR
+ENV LD_LIBRARY_PATH /opt/mcr/v93/runtime/glnxa64:/opt/mcr/v93/bin/glnxa64:/opt/mcr/v93/sys/os/glnxa64
+ENV XAPPLRESDIR /opt/mcr/v93/X11/app-defaults
 #
 #
 ######################################################
