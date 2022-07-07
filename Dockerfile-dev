@@ -178,7 +178,7 @@ RUN sed -i -e 's+FSL_FIX_R_CMD="${FSLDIR}/fslpython/envs/fslpython/bin/R"+FSL_FI
 # See http://www.mathworks.com/products/compiler/mcr/ for more info.
 # Adapted from https://github.com/flywheel-apps/matlab-mcr
 
-#update for possible resolution to java issue
+#update for possible resolution to java issue ** 7??
 # Install OpenJDK-8
 RUN apt-get update && \
     apt-get install -y openjdk-8-jdk && \
@@ -193,6 +193,16 @@ RUN apt-get update && \
 
 # Setup JAVA_HOME -- useful for docker commandline
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+
+# other packages we need...
+RUN apt-get install -y \
+      libqt5gui5 \
+      apt-file \
+    && apt-file update
+
+RUN apt install --reinstall libqt5widgets5 libqt5gui5 libqt5dbus5 libqt5network5 libqt5core5a \
+
+
 
 RUN apt-get -qq update && apt-get -qq install -y \
     unzip \
@@ -210,7 +220,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     rm -rf mcr-install
 
 # Configure environment variables for MCR
-ENV LD_LIBRARY_PATH /opt/mcr/v93/runtime/glnxa64:/opt/mcr/v93/bin/glnxa64:/opt/mcr/v93/sys/os/glnxa64
+#ENV LD_LIBRARY_PATH /opt/mcr/v93/runtime/glnxa64:/opt/mcr/v93/bin/glnxa64:/opt/mcr/v93/sys/os/glnxa64
 ENV XAPPLRESDIR /opt/mcr/v93/X11/app-defaults
 #
 #
