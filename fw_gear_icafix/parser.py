@@ -4,6 +4,7 @@ from zipfile import ZipFile
 from flywheel_gear_toolkit import GearToolkitContext
 import os
 import logging
+from pathlib import Path
 log = logging.getLogger(__name__)
 
 # This function mainly parses gear_context's config.json file and returns relevant
@@ -18,7 +19,9 @@ class GearArgs:
             [type]: [description]
         """
 
-        # setup enviornment for python system commands
+        # setup enviornment for python system commands - all enviornment variables should be
+        #    defined in the manifest and attached to the docker image via flywheel engine
+        #    if a static ENV is desired, an env file can be generated and attached to project
         if env_file:
             with open(env_file, "r") as f:
                 self.environ = json.load(f)
@@ -27,24 +30,22 @@ class GearArgs:
 
         # pull input filepaths
         self.debug = gtk_context.config.get("debug")
-        self.fslicense = gtk_context.config_json["inputs"].get("freesurfer_license")
         self.hcpfunc_zipfile = gtk_context.get_input_path("hcpfunc_zip")
         self.hcpstruct_zipfile = gtk_context.get_input_path("hcpstruct_zip")
 
         # pull config settings
-        self.options = gtk_context.config
+        self.icafix = {
+            "common_command": "/opt/HCP-Pipelines/ICAFIX/hcp_fix",
+            "params": ""
+        }
+        self.config = gtk_context.config
         self.gtk_context = gtk_context
         self.work_dir = gtk_context.work_dir
+        self.outputs_dir = Path("/flywheel/v0/outputs")
 
         # unzip HCPpipeline files
-        self.unzip_hcp(self.hcpstruct_zipfile)
-        self.unzip_hcp(self.hcpfunc_zipfile)
-
-        # with open(
-        #     gtk_context.get_input_path("freesurfer_license"), "r", encoding="utf8"
-        # ) as text_file:
-        #     self.fslicense_text = " ".join(text_file.readlines())
-
+        # self.unzip_hcp(self.hcpstruct_zipfile)
+        # self.unzip_hcp(self.hcpfunc_zipfile)
 
 
 
@@ -62,6 +63,6 @@ class GearArgs:
 n        """
         hcp_zip = ZipFile(zip_filename, "r")
         log.info("Unzipping hcp outputs, %s", zip_filename)
-        if not self.options.get("gear_dry_run"):
+        if not self.config.get("dry_run"):
             hcp_zip.extractall(self.work_dir)
             log.debug(f'Unzipped the file to {self.work_dir}')
