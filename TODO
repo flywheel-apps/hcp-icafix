@@ -1,3 +1,0 @@
-1) Convert sections of the run bash script to the args.{build,validate,execute} paradigm
-2) Ensure outputs, logs, .metadata is incorporated into the instance
-3) Make sure that Dockerfile is in order to share layers with other members of the HCP-suite
