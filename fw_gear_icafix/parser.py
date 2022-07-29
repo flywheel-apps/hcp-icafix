@@ -30,8 +30,10 @@ class GearArgs:
 
         # pull input filepaths
         self.debug = gtk_context.config.get("debug")
-        self.hcpfunc_zipfile = gtk_context.get_input_path("hcpfunc_zip")
-        self.hcpstruct_zipfile = gtk_context.get_input_path("hcpstruct_zip")
+        self.hcpfunc_zipfile = gtk_context.get_input_path("functional_zip")
+        log.info("Inputs file path, %s", self.hcpfunc_zipfile)
+        self.hcpstruct_zipfile = gtk_context.get_input_path("structural_zip")
+        log.info("Inputs file path, %s", self.hcpstruct_zipfile)
 
         # pull config settings
         self.icafix = {
@@ -40,12 +42,12 @@ class GearArgs:
         }
         self.config = gtk_context.config
         self.gtk_context = gtk_context
-        self.work_dir = gtk_context.work_dir
-        self.outputs_dir = Path("/flywheel/v0/outputs")
+        self.work_dir = Path("/flywheel/v0/work")
+        self.outputs_dir = Path("/flywheel/v0/output")
 
         # unzip HCPpipeline files
-        # self.unzip_hcp(self.hcpstruct_zipfile)
-        # self.unzip_hcp(self.hcpfunc_zipfile)
+        self.unzip_hcp(self.hcpstruct_zipfile)
+        self.unzip_hcp(self.hcpfunc_zipfile)
 
 
 

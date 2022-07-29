@@ -42,7 +42,7 @@ def run(gear_args):
         generate_ica_command(f, gear_args)
 
         # execute hcp_fix command (inside this method checks for gear-dry-run)
-        # execute(gear_args)
+        execute(gear_args)
 
     # cleanup gear and store outputs and logs...
     cleanup(gear_args)
@@ -129,7 +129,7 @@ def cleanup(gear_args: GearToolkitContext):
     # Following HCP directory structure, input fMRI should be preprocessed and in the MNINonLinear/Results directory
     # Look for tasks in HCP preprocessed file list
     searchfiles = sp.Popen(
-        "ls -d " + gear_args.work_dir.absolute().as_posix() + "/*/MNINonLinear/Results/*task*/*task*clean*", shell=True,
+        "cd " + gear_args.work_dir.absolute().as_posix() + "; ls -d  */MNINonLinear/Results/*task*/*task*clean*", shell=True,
         stdout=sp.PIPE,
         stderr=sp.PIPE, universal_newlines=True
     )
@@ -144,7 +144,7 @@ def cleanup(gear_args: GearToolkitContext):
     if not gear_args.config["DeleteIntermediates"]:
         # add the ica folders to zipped output...
         searchfiles = sp.Popen(
-            "ls -d " + gear_args.work_dir.absolute().as_posix() + "/*/MNINonLinear/Results/*task*/*task*.ica", shell=True,
+            "cd " + gear_args.work_dir.absolute().as_posix() + "; ls -d */MNINonLinear/Results/*task*/*task*.ica", shell=True,
             stdout=sp.PIPE,
             stderr=sp.PIPE, universal_newlines=True
         )
@@ -156,28 +156,21 @@ def cleanup(gear_args: GearToolkitContext):
     newline = "\n"
     log.info("The following output files will be saved: \n %s", newline.join(outfiles))
 
-    # Move all images to output directory
-    sp.Popen("rm -Rf " + gear_args.outputs_dir.absolute().as_posix(), shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
-    sp.Popen("mkdir " + gear_args.outputs_dir.absolute().as_posix(), shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
-
-    for fl in outfiles:
-        dest = op.join(gear_args.outputs_dir, op.basename(fl))
-        cpfiles = sp.Popen("cp -R " + fl + " " + dest, shell=True, stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
-
-
     # zip output files
-    os.chdir(gear_args.outputs_dir)
-    output_zipname = "hcpfix_results.zip"
+    os.chdir(gear_args.work_dir)
+    output_zipname = gear_args.outputs_dir.absolute().as_posix() + "/hcpfix_results.zip"
     outzip = ZipFile(output_zipname, "w", ZIP_DEFLATED)
 
-    for root, _, files in os.walk(gear_args.outputs_dir):
-        for fl in files:
-            fl_path = op.join(root, fl)
-            outzip.write(fl_path)
+    for fl in outfiles:
+        if os.path.isdir(fl):
+            for root, _, files in os.walk(fl):
+                for ff in files:
+                    ff_path = op.join(root, ff)
+                    outzip.write(ff_path)
+        else:
+            outzip.write(fl)
 
     outzip.close()
-
-    # print logs...
 
     # log final results size
     os.chdir(gear_args.outputs_dir)

@@ -41,7 +41,7 @@ def main(context: GearToolkitContext) -> None:  # pragma: no cover
 # Only execute if file is run as main, not when imported by another module
 if __name__ == "__main__":  # pragma: no cover
     # Get access to gear config, inputs, and sdk client if enabled.
-    with GearToolkitContext(manifest_path='/opt/project/manifest.json', config_path='/opt/project/config.json') as gear_context:
+    with GearToolkitContext(manifest_path='/flywheel/v0/manifest.json', config_path='/flywheel/v0/config.json') as gear_context:
 
         # Initialize logging, set logging level based on `debug` configuration
         # key in gear config.

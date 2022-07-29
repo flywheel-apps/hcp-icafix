@@ -2,6 +2,7 @@ ignore*
 work/
 input/
 ouptut/
+fix/
 calldocker.sh
 config.json
 this_job
