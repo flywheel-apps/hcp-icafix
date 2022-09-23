@@ -1,1 +1,10 @@
 ignore*
+work/
+input/
+ouptut/
+fix/
+calldocker.sh
+config.json
+this_job
+.idea
+.DS_Store
