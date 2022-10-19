@@ -34,7 +34,7 @@ RUN apt-get update \
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
     echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list.d/cran-rstudio.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends r-base-core=3.3.1-* r-base-dev=3.3.1-* && \
+    apt-get install -y --force-yes --no-install-recommends r-base-core=3.3.1-* r-base-dev=3.3.1-* && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
