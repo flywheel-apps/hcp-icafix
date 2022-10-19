@@ -111,7 +111,7 @@ RUN apt-get update && \
 WORKDIR /opt/
 RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
         chmod +x fslinstaller.py && \
-        ./fslinstaller.py -q -d /usr/local/fsl -V 5.0.10
+        python3 fslinstaller.py -q -d /usr/local/fsl -V 5.0.10
 
 # Configure FSL environment
 ENV FSLDIR=/usr/local/fsl
