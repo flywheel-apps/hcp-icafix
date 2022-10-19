@@ -98,7 +98,10 @@ COPY neurodebian_pgpkey.txt /tmp/
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
-    curl -sSL http://neuro.debian.net/lists/trusty.us-ca.full >> /etc/apt/sources.list.d/neurodebian.sources.list && \
+    echo "deb http://neurodeb.pirsquared.org data main contrib non-free" > /etc/apt/sources.list.d/neurodebian.sources.list && \
+    echo "#deb-src http://neurodeb.pirsquared.org data main contrib non-free" >> /etc/apt/sources.list.d/neurodebian.sources.list && \
+    echo "deb http://neurodeb.pirsquared.org trusty main contrib non-free" >> /etc/apt/sources.list.d/neurodebian.sources.list && \
+    echo "#deb-src http://neurodeb.pirsquared.org trusty main contrib non-free" >> /etc/apt/sources.list.d/neurodebian.sources.list && \
     apt-key add /tmp/neurodebian_pgpkey.txt && \
     apt-get update && \
     apt-get install -y dc && \
