@@ -134,13 +134,13 @@ elif [[ ! -z "${FW_CONFIG_FIXClassifier}" ]]; then
 fi
 
 
-if [[ -z "${FW_CONFIG_Subject}" ]] || [[ $(toupper "${FW_CONFIG_Subject}") = "EMPTY" ]]; then
+if [[ -z "${FW_CONFIG_Subject}" ]] || [[ $(toupper "${FW_CONFIG_Subject}") = "EMPTY" ]] || [[ $(toupper "${FW_CONFIG_Subject}") = "NULL" ]]; then
   Subject="${hcpfunc_Subject}"
 else
   Subject="${FW_CONFIG_Subject}"
 fi
 
-if [[ -z "${FW_CONFIG_RegName}" ]] || [[ $(toupper "${FW_CONFIG_RegName}") = "EMPTY" ]]; then
+if [[ -z "${FW_CONFIG_RegName}" ]] || [[ $(toupper "${FW_CONFIG_RegName}") = "EMPTY" ]] || [[ $(toupper "${FW_CONFIG_RegName}") = "NULL" ]]; then
   RegName="${hcpfunc_RegName}"
 else
   RegName="${FW_CONFIG_RegName}"
