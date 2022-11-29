@@ -153,9 +153,22 @@ RUN apt-get update && \
 
 ## Install FSL 5.0.10
 WORKDIR /opt/
-RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
-        chmod +x fslinstaller.py && \
-        python3 fslinstaller.py -q -d /usr/local/fsl -V 5.0.10
+#RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
+#        chmod +x fslinstaller.py && \
+#        python3 fslinstaller.py --manifest https://fsl.fmrib.ox.ac.uk/fsldownloads/manifest.json -d /usr/local/fsl -V 5.0.10
+ENV INSTALL_FOLDER=/usr/local/fsl
+RUN mkdir -p $INSTALL_FOLDER
+RUN curl -sSL https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos7_64.tar.gz | tar xz -C ${INSTALL_FOLDER} \
+    --exclude='fsl/doc' \
+    --exclude='fsl/data/first' \
+    --exclude='fsl/data/atlases' \
+    --exclude='fsl/src' \
+    --exclude='fsl/extras/src' \
+    --exclude='fsl/bin/fslview*' \
+    --exclude='fsl/bin/FSLeyes' \
+    --exclude='fsl/bin/*_gpu*' \
+    --exclude='fsl/bin/*_cuda*'
+
 
 # Configure FSL environment
 ENV FSLDIR=/usr/local/fsl
