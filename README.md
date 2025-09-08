@@ -1,3 +1,6 @@
+> [!WARNING]
+> This repo has moved to [https://gitlab.com/flywheel-io/flywheel-apps/bids-hcp](https://gitlab.com/flywheel-io/flywheel-apps/bids-hcp)
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/flywheel/hcp-icafix.svg)](https://hub.docker.com/r/flywheel/hcp-icafix/)
 [![Docker Stars](https://img.shields.io/docker/stars/flywheel/hcp-icafix.svg)](https://hub.docker.com/r/flywheel/hcp-icafix/)
 # flywheel/hcp-icafix
